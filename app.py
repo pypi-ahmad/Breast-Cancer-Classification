@@ -95,6 +95,25 @@ with st.sidebar:
         default=default_models,
     )
 
+    st.header("🎛️ Sensitivity Tuner")
+    st.caption("Lower thresholds increase sensitivity (Recall) but may raise false positives.")
+    malignant_threshold = st.slider(
+        "Malignant probability threshold",
+        min_value=0.0,
+        max_value=1.0,
+        value=0.50,
+        step=0.01,
+        help="If P(Malignant) ≥ threshold → predict Malignant.",
+    )
+    consensus_threshold = st.slider(
+        "Consensus vote threshold",
+        min_value=0.0,
+        max_value=1.0,
+        value=0.50,
+        step=0.05,
+        help="If (Malignant votes / selected models) ≥ threshold → consensus Malignant.",
+    )
+
     st.header("Data Source")
     data_mode = st.radio("Choose Input", ["Upload CSV", "Load Sample (Sklearn)"])
     uploaded_file = None
@@ -147,7 +166,7 @@ with tab1:
         for name in selected_models:
             model = models[name]
             malignant_proba = get_malignant_proba(model, X_scaled)
-            pred_label = np.where(malignant_proba >= 0.5, 0, 1)
+            pred_label = np.where(malignant_proba >= malignant_threshold, 0, 1)
             model_predictions[name] = np.where(pred_label == 0, "Malignant", "Benign")
 
         malignant_votes = (model_predictions == "Malignant").sum(axis=1)
@@ -156,7 +175,7 @@ with tab1:
         results_table = df_display.copy()
         results_table["Consensus Score"] = consensus_score
         results_table["Consensus Diagnosis"] = np.where(
-            consensus_score >= 0.5, "Malignant", "Benign"
+            consensus_score >= consensus_threshold, "Malignant", "Benign"
         )
         results_table = pd.concat([results_table, model_predictions], axis=1)
 
@@ -187,7 +206,8 @@ with tab2:
 
         for name in selected_models:
             model = models[name]
-            preds = model.predict(X_scaled)
+            tuned_proba = get_malignant_proba(model, X_scaled)
+            preds = np.where(tuned_proba >= malignant_threshold, 0, 1)
 
             metrics_rows.append({
                 "Model": name,
@@ -197,8 +217,7 @@ with tab2:
                 "F1": f1_score(labels, preds, pos_label=0),
             })
 
-            proba = get_malignant_proba(model, X_scaled)
-            fpr, tpr, _ = roc_curve(y_true_plot, proba)
+            fpr, tpr, _ = roc_curve(y_true_plot, tuned_proba)
             roc_traces.append((name, fpr, tpr, auc(fpr, tpr)))
 
         metrics_df = pd.DataFrame(metrics_rows).set_index("Model")
@@ -253,7 +272,8 @@ with tab2:
         st.markdown("#### Confusion Matrices")
         cm_cols = st.columns(len(selected_models))
         for i, name in enumerate(selected_models):
-            preds = models[name].predict(X_scaled)
+            tuned_proba = get_malignant_proba(models[name], X_scaled)
+            preds = np.where(tuned_proba >= malignant_threshold, 0, 1)
             cm = confusion_matrix(labels, preds, labels=[0, 1])
             fig_cm = go.Figure(
                 data=go.Heatmap(
