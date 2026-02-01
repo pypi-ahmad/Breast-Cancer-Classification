@@ -1,92 +1,86 @@
-# OncoGuard: Breast Cancer Diagnostic AI 🏥
+# Universal ML Command Center 🌍
 
-![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
-![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-FF4B4B?logo=streamlit&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)
-![SHAP](https://img.shields.io/badge/SHAP-XAI-111827)
-![XGBoost](https://img.shields.io/badge/XGBoost-Boosted%20Trees-2E86AB)
-![License: MIT](https://img.shields.io/badge/License-MIT-green)
+> **A "No-Code" Adaptive Machine Learning Platform.**
+>
+> [![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=flat&logo=streamlit&logoColor=white)](https://streamlit.io/)
+> [![FLAML](https://img.shields.io/badge/FLAML-Microsoft-blue)](https://microsoft.github.io/FLAML/)
+> [![SHAP](https://img.shields.io/badge/XAI-SHAP-orange)](https://shap.readthedocs.io/)
 
-**A Medical-Grade AI Command Center for Tumor Classification.**
+This repository hosts a **Universal Classification Engine** that automatically trains high-performance models using **FLAML (AutoML)** and generates a **Dynamic Dashboard** that adapts its UI to your dataset.
 
-## Project Overview
+Whether you are predicting **Breast Cancer**, **Customer Churn**, or **Loan Default**, this system adapts without requiring you to rewrite the frontend code.
 
-**Mission:** Build a clinician-friendly diagnostic assistant that classifies breast tumors as **Malignant vs. Benign**, prioritizing **high sensitivity (Recall)** to minimize **false negatives**.
+---
 
-**Approach:** Train an ensemble of **5 machine learning models**—**SVM**, **XGBoost**, **Random Forest**, **KNN**, and **Logistic Regression**—then use **Explainable AI (SHAP)** to reveal *why* a specific case was flagged as malignant, improving transparency and trust.
+## 🚀 Key Features
 
-## Key Features
+### 1. 🤖 Automated Machine Learning (AutoML)
+Powered by **Microsoft FLAML**, the engine automatically:
+- Selects the best algorithms (XGBoost, LightGBM, Random Forest, etc.).
+- Tunes hyperparameters within your specified time budget.
+- Generates an **Ensemble** of top-performing models for "Consensus Voting".
 
-- **🧠 Explainable AI (XAI)**: SHAP waterfall plots explaining *why* a specific patient was diagnosed as Malignant.
-- **🎛️ Sensitivity Tuner**: Real-time decision threshold adjustment for medical safety.
-- **🗳️ Multi-Model Consensus**: Voting system combining 5 algorithms for robust predictions.
-- **🔬 Deep EDA**: PCA Manifold visualization and Feature Correlation heatmaps.
-- **🐳 Containerized**: Fully Dockerized for "Write Once, Run Anywhere" deployment.
+### 2. 🦎 Adaptive Dashboard
+The `app.py` frontend is **dataset-agnostic**. It reads metadata from the trained bundle to automatically:
+- Set the App Title.
+- Label the classes (e.g., "Malignant" vs "Benign", or "Churn" vs "Stay").
+- Generate input fields for the **Symptom Predictor** based on your feature columns.
 
-## Tech Stack
+### 3. 🩺 Symptom Predictor (What-If Simulator)
+A sidebar tool allows doctors or analysts to manually input data and get real-time predictions from the best model, complete with probability scores.
 
-- **Core**: Python 3.11, Scikit-Learn, XGBoost.
-- **Dashboard**: Streamlit, Plotly (Interactive Charts), Matplotlib (SHAP).
-- **DevOps**: Docker.
+### 4. 🧠 Explainable AI (XAI)
+Built-in **SHAP (SHapley Additive exPlanations)** integration provides:
+- **Global Importance:** Which features matter most across the dataset?
+- **Local Explanation:** Why did the model predict "High Risk" for *this specific patient*?
 
-## Quick Start Guide
+---
 
-### Step 1: Installation
+## 🛠️ Quick Start
 
+### Prerequisites
+- Python 3.8+
+- [Optional] Virtual Environment recommended.
+
+### 1. Installation
 ```bash
 pip install -r requirements.txt
 ```
 
-### Step 2: Training
+### 2. Configuration & Training
+Open `train_automl.py` and edit the **CONFIGURATION** block at the top:
 
-Train the full model suite and export the bundle:
-
-```bash
-python train.py
+```python
+# --- CONFIGURATION ---
+DATA_SOURCE = "sklearn_breast_cancer"  # or path/to/your.csv
+TARGET_COLUMN = "target"               # The column to predict
+APP_TITLE = "Breast Cancer AI 🏥"      # Dashboard Title
+CLASS_LABELS = {0: "Malignant", 1: "Benign"} # Map 0/1 to text
+TIME_BUDGET = 90                       # Training time (seconds)
 ```
 
-This generates `models_bundle.pkl` (plus a small `sample_data.csv`).
+Run the engine:
+```bash
+python train_automl.py
+```
+*This will train the models and save a `models_bundle.pkl` artifact.*
 
-### Step 3: Launch
-
+### 3. Launch the Dashboard
 ```bash
 streamlit run app.py
 ```
+*The app will launch in your browser, fully adapted to your new dataset.*
 
-Open the dashboard at `http://localhost:8501`.
+---
 
-### Step 4: Docker
+## 📂 Project Structure
 
-Build:
+- **`train_automl.py`**: The "Backend". Configurable AutoML engine that trains models and saves the bundle.
+- **`app.py`**: The "Frontend". A universal Streamlit dashboard that loads the bundle and adapts the UI.
+- **`models_bundle.pkl`**: The "Brain". Contains the trained models, scaler, and metadata (Title, Labels, Features).
+- **`requirements.txt`**: Dependency list.
 
-```bash
-docker build -t oncoguard .
-```
+---
 
-Run:
-
-```bash
-docker run --rm -p 8501:8501 oncoguard
-```
-
-## File Structure
-
-```text
-.
-├─ app.py                 # Streamlit dashboard (EDA + inference + SHAP)
-├─ train.py               # Trains 5 models and exports the model bundle
-├─ models_bundle.pkl       # Serialized models + scaler + feature list (generated by training)
-├─ Dockerfile             # Container definition for portable deployment
-├─ requirements.txt       # Python dependencies
-├─ sample_data.csv        # Small sample dataset for quick testing (generated by training)
-└─ Breast Cancer Classification.ipynb
-```
-
-## Model Performance
-
-This system prioritizes **Recall (Sensitivity)**—catching as many malignant cases as possible—over raw accuracy.
-In a medical screening context, missing a cancer case (false negative) is typically more costly than a false alarm.
-
-## Disclaimer
-
-For educational purposes only. Not FDA approved for clinical use.
+## 🛡️ License
+MIT License
