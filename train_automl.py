@@ -6,6 +6,7 @@ This script uses Microsoft FLAML to automatically train and tune multiple classi
 scaler, and metadata into a pickle bundle for the dashboard app.
 """
 import warnings
+from pathlib import Path
 import joblib
 import pandas as pd
 import numpy as np
@@ -58,6 +59,8 @@ def load_data() -> pd.DataFrame:
             return df
         except FileNotFoundError:
             raise FileNotFoundError(f"❌ Could not find file: {DATA_SOURCE}")
+        except Exception as exc:
+            raise ValueError(f"❌ Failed to load CSV data from '{DATA_SOURCE}': {exc}") from exc
 
 def train_flaml_model(x_train: np.ndarray, y_train: pd.Series, estimator_name: str, time_budget: int) -> AutoML:
     """
@@ -73,13 +76,15 @@ def train_flaml_model(x_train: np.ndarray, y_train: pd.Series, estimator_name: s
         AutoML: The trained AutoML object.
     """
     automl = AutoML()
+    logs_dir = Path("logs")
+    logs_dir.mkdir(parents=True, exist_ok=True)
     
     settings = {
         "time_budget": time_budget,  # total running time in seconds
         "metric": 'roc_auc',         # optimization metric
         "task": 'classification',    # task type
         "estimator_list": [estimator_name], # Restrict to specific algorithm
-        "log_file_name": f"flaml_{estimator_name}.log",
+        "log_file_name": str(logs_dir / f"flaml_{estimator_name}.log"),
         "verbose": 0,
         "seed": 42,
     }
@@ -87,7 +92,7 @@ def train_flaml_model(x_train: np.ndarray, y_train: pd.Series, estimator_name: s
     print(f"   ⏳ Tuning {estimator_name}...")
     automl.fit(X_train=x_train, y_train=y_train, **settings)
     print(f"      - Best config: {automl.best_config}")
-    print(f"      - Best accuracy: {1 - automl.best_loss:.4f}")
+    print(f"      - Best ROC-AUC: {1 - automl.best_loss:.4f}")
     return automl
 
 def evaluate_models(models: dict, x_test: np.ndarray, y_test: pd.Series) -> pd.DataFrame:
@@ -110,9 +115,9 @@ def evaluate_models(models: dict, x_test: np.ndarray, y_test: pd.Series) -> pd.D
         metrics = {
             "Model": name,
             "Accuracy": accuracy_score(y_test, y_pred),
-            "Recall (Sensitivity)": recall_score(y_test, y_pred, pos_label=0), 
-            "Precision": precision_score(y_test, y_pred, pos_label=0),
-            "F1 Score": f1_score(y_test, y_pred, pos_label=0),
+            "Recall (Sensitivity)": recall_score(y_test, y_pred, pos_label=0, zero_division=0), 
+            "Precision": precision_score(y_test, y_pred, pos_label=0, zero_division=0),
+            "F1 Score": f1_score(y_test, y_pred, pos_label=0, zero_division=0),
         }
         results.append(metrics)
     return pd.DataFrame(results)
@@ -125,7 +130,7 @@ def main():
     3. Train Multiple AutoML Models
     4. Evaluate & Save Bundle
     """
-    warnings.filterwarnings("ignore")
+    warnings.filterwarnings("default")
     print(f"🚀 Starting {APP_TITLE} Model Training Engine")
     print(f"⚙️  Time Budget: {TIME_BUDGET}s per model")
 
@@ -173,6 +178,9 @@ def main():
             trained_models[display_name] = model
         except Exception as e:
             print(f"⚠️  Failed to train {display_name}: {e}")
+
+    if not trained_models:
+        raise RuntimeError("No models were trained successfully; aborting bundle save.")
 
     # 6. Evaluate
     print("\n📊 Evaluating Performance...")

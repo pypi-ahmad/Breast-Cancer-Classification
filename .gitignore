@@ -1,6 +1,8 @@
 # Artifacts
 models_bundle.pkl
 *.pkl
+*.log
+logs/
 
 # Python
 __pycache__/

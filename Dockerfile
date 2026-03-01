@@ -1,16 +1,17 @@
-FROM python:3.11-slim
+FROM python:3.13-slim
 
 WORKDIR /app
 
-LABEL org.opencontainers.image.title="OncoGuard"
-LABEL org.opencontainers.image.description="Streamlit command center for breast tumor classification (Malignant vs Benign) with XAI (SHAP) and multi-model consensus."
-LABEL org.opencontainers.image.licenses="MIT"
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt ./
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app.py train.py models_bundle.pkl sample_data.csv ./
+COPY . .
 
 EXPOSE 8501
 
-ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+CMD ["sh", "-c", "[ -f models_bundle.pkl ] || python train_automl.py; streamlit run app.py --server.port=8501 --server.address=0.0.0.0"]

@@ -1,12 +1,11 @@
-flaml
+flaml[automl]
 shap
 streamlit
 pandas
-numpy==2.3
+numpy==2.3.0
 scikit-learn
 plotly
 matplotlib
 joblib
-openpyxl
-flaml[automl]
-fpdf
+pytest
+pytest-cov

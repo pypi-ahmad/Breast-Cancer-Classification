@@ -8,6 +8,7 @@ classes) based on the metadata found in `models_bundle.pkl`.
 import joblib
 import numpy as np
 import pandas as pd
+from pandas.errors import EmptyDataError, ParserError
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
@@ -44,10 +45,21 @@ def load_bundle():
         dict: The loaded bundle dictionary.
     """
     try:
-        return joblib.load("models_bundle.pkl")
+        bundle_data = joblib.load("models_bundle.pkl")
     except FileNotFoundError:
         st.error("⚠️ Model bundle not found. Run 'python train_automl.py' first to initialize the engine.")
         st.stop()
+    except Exception as exc:
+        st.error(f"⚠️ Failed to load model bundle: {exc}")
+        st.stop()
+
+    required_keys = {"models", "scaler", "feature_names"}
+    missing_keys = required_keys - set(bundle_data.keys())
+    if missing_keys:
+        st.error(f"⚠️ Invalid model bundle. Missing keys: {sorted(missing_keys)}")
+        st.stop()
+
+    return bundle_data
 
 
 # --- Load Model Bundle ---
@@ -66,7 +78,11 @@ metadata = bundle.get("metadata", {
     "class_labels": {0: "Malignant", 1: "Benign"}
 })
 APP_TITLE = metadata["title"]
-CLASS_LABELS = metadata["class_labels"]
+raw_class_labels = metadata.get("class_labels", {0: "Malignant", 1: "Benign"})
+CLASS_LABELS = {int(k): v for k, v in raw_class_labels.items()}
+if 0 not in CLASS_LABELS or 1 not in CLASS_LABELS:
+    st.error("⚠️ Invalid class_labels in bundle metadata. Expected keys 0 and 1.")
+    st.stop()
 POS_CLASS = CLASS_LABELS[0]
 NEG_CLASS = CLASS_LABELS[1]
 
@@ -100,12 +116,23 @@ def get_positive_proba(model, x):
     if hasattr(model, "predict_proba"):
         proba = model.predict_proba(x)
         if proba.ndim == 2 and proba.shape[1] >= 2:
+            if hasattr(model, "classes_"):
+                classes = list(model.classes_)
+                if 0 in classes:
+                    return proba[:, classes.index(0)]
             return proba[:, 0]
         if proba.ndim == 1:
             return proba
     if hasattr(model, "decision_function"):
         scores = model.decision_function(x)
-        return 1 / (1 + np.exp(-scores))
+        if np.ndim(scores) == 2:
+            if hasattr(model, "classes_"):
+                classes = list(model.classes_)
+                if 0 in classes:
+                    col_idx = classes.index(0)
+                    return 1 / (1 + np.exp(-scores[:, col_idx]))
+            return 1 / (1 + np.exp(-scores[:, 0]))
+        return 1 / (1 + np.exp(scores))
     preds = model.predict(x) if hasattr(model, "predict") else np.zeros(x.shape[0])
     return np.where(preds == 0, 1.0, 0.0)
 
@@ -119,7 +146,10 @@ def load_dataframe_from_sklearn():
 
 def load_dataframe_from_upload(uploaded_file):
     """Loads data from a user-uploaded CSV file."""
-    return pd.read_csv(uploaded_file)
+    try:
+        return pd.read_csv(uploaded_file)
+    except (EmptyDataError, ParserError, UnicodeDecodeError) as exc:
+        raise ValueError(f"Invalid CSV input: {exc}") from exc
 
 
 # --- Header ---
@@ -157,7 +187,7 @@ with st.sidebar:
     )
 
     st.header("Data Source")
-    data_mode = st.radio("Choose Input", ["Upload CSV", "Load Sample (Sklearn)"])
+    data_mode = st.radio("Choose Input", ["Upload CSV", "Load Sample (Sklearn)"], index=1)
     uploaded_file = None
     if data_mode == "Upload CSV":
         uploaded_file = st.file_uploader("Upload Patient Data (CSV)", type="csv")
@@ -170,7 +200,11 @@ labels = None
 if data_mode == "Load Sample (Sklearn)":
     df = load_dataframe_from_sklearn()
 elif uploaded_file:
-    df = load_dataframe_from_upload(uploaded_file)
+    try:
+        df = load_dataframe_from_upload(uploaded_file)
+    except ValueError as exc:
+        st.error(str(exc))
+        st.stop()
 
 if df is None:
     st.info("Awaiting data upload or sample load.")
@@ -183,10 +217,27 @@ if "target" in df.columns:
 else:
     df_features = df
 
+if df_features.empty:
+    st.error("⚠️ Input data has no feature rows after preprocessing.")
+    st.stop()
+
 # --- Feature Alignment + Scaling ---
 df_display = df_features.copy()
+original_columns = set(df_features.columns)
+missing_features = [name for name in feature_names if name not in original_columns]
+extra_features = [name for name in df_features.columns if name not in feature_names]
+
+if missing_features:
+    st.warning(f"Missing {len(missing_features)} expected feature(s); filled with 0.")
+if extra_features:
+    st.info(f"Ignored {len(extra_features)} extra input feature(s) not used by the model.")
+
 df_features = df_features.reindex(columns=feature_names, fill_value=0)
-X_scaled = scaler.transform(df_features)
+try:
+    X_scaled = scaler.transform(df_features)
+except ValueError as exc:
+    st.error(f"⚠️ Failed to scale input features: {exc}")
+    st.stop()
 X_unscaled = scaler.inverse_transform(X_scaled)
 df_unscaled = pd.DataFrame(X_unscaled, columns=feature_names, index=df_features.index)
 
@@ -264,7 +315,7 @@ with tab1:
         st.dataframe(
             results_table[display_cols]
             .style.background_gradient(subset=["Consensus Score"], cmap="Reds"),
-            width='stretch',
+            use_container_width=True,
         )
 
 # --- TAB 2: Ranking & Performance ---
@@ -304,7 +355,7 @@ with tab2:
 
         st.dataframe(
             metrics_df.style.highlight_max(axis=0, color="#d1e7dd").format("{:.2%}"),
-            width='stretch',
+            use_container_width=True,
         )
 
         col_a, col_b = st.columns(2)
@@ -321,7 +372,7 @@ with tab2:
                 color="Metric",
                 barmode="group",
             )
-            st.plotly_chart(fig_metrics, width='stretch')
+            st.plotly_chart(fig_metrics, use_container_width=True)
 
         with col_b:
             st.markdown("#### ROC Curves")
@@ -348,7 +399,7 @@ with tab2:
                 yaxis_title="True Positive Rate",
                 title=f"ROC Curves ({POS_CLASS} as Positive)",
             )
-            st.plotly_chart(fig_roc, width='stretch')
+            st.plotly_chart(fig_roc, use_container_width=True)
 
         st.markdown("#### Confusion Matrices")
         cm_cols = st.columns(len(selected_models))
@@ -368,7 +419,7 @@ with tab2:
             fig_cm.update_layout(margin=dict(t=30, b=0, l=0, r=0), height=250)
             with cm_cols[i]:
                 st.markdown(f"**{name}**")
-                st.plotly_chart(fig_cm, width='stretch', key=f"cm_{name}")
+                st.plotly_chart(fig_cm, use_container_width=True, key=f"cm_{name}")
 
 # --- TAB 3: Deep EDA ---
 with tab3:
@@ -389,7 +440,7 @@ with tab3:
                 color="Diagnosis",
                 color_discrete_map={POS_CLASS: "red", NEG_CLASS: "green"},
             )
-            st.plotly_chart(fig_pie, width='stretch')
+            st.plotly_chart(fig_pie, use_container_width=True)
 
     with col2:
         st.markdown("#### PCA Visualization (2D)")
@@ -405,16 +456,22 @@ with tab3:
             )
         else:
             fig_pca = px.scatter(pca_df, x="PC1", y="PC2")
-        st.plotly_chart(fig_pca, width='stretch')
+        st.plotly_chart(fig_pca, use_container_width=True)
 
     st.markdown("#### Feature Analysis")
-    feature_choice = st.selectbox("Select Feature", feature_names, index=0)
+    display_feature_options = [name for name in feature_names if name in df_display.columns]
+    if not display_feature_options:
+        display_feature_options = list(df_display.columns)
+    if not display_feature_options:
+        st.error("⚠️ No usable feature columns available for analysis.")
+        st.stop()
+    feature_choice = st.selectbox("Select Feature", display_feature_options, index=0)
 
     col3, col4 = st.columns(2)
     with col3:
         if labels is None:
             fig_hist = px.histogram(df_display, x=feature_choice)
-            st.plotly_chart(fig_hist, width='stretch')
+            st.plotly_chart(fig_hist, use_container_width=True)
         else:
             box_df = pd.concat([df_display[feature_choice], labels.rename("target")], axis=1)
             box_df["Diagnosis"] = box_df["target"].map(CLASS_LABELS)
@@ -426,7 +483,7 @@ with tab3:
                 color_discrete_map={POS_CLASS: "red", NEG_CLASS: "green"},
                 points="all",
             )
-            st.plotly_chart(fig_box, width='stretch')
+            st.plotly_chart(fig_box, use_container_width=True)
 
     with col4:
         st.markdown("#### Top 10 Feature Correlations")
@@ -436,7 +493,7 @@ with tab3:
             # 1. Compute correlation with Target
             corr_data = df_features.copy()
             corr_data["target"] = labels
-            corr_matrix_full = corr_data.corr()
+            corr_matrix_full = corr_data.corr(numeric_only=True)
             
             # 2. Get Top 10 features strongly correlated with Diagnosis
             top_features = (
@@ -449,7 +506,7 @@ with tab3:
             )
             
             # 3. Plot Heatmap of ONLY those top features
-            top_corr_matrix = df_features[top_features].corr()
+            top_corr_matrix = df_features[top_features].corr(numeric_only=True)
             
             fig_corr = px.imshow(
                 top_corr_matrix, 
@@ -457,7 +514,7 @@ with tab3:
                 aspect="auto",
                 title="Correlation (Top 10 Features)"
             )
-            st.plotly_chart(fig_corr, width='stretch')
+            st.plotly_chart(fig_corr, use_container_width=True)
 
 # --- TAB 4: Model Explainability ---
 with tab4:
@@ -488,14 +545,14 @@ with tab4:
                 shap_values = shap_values[:, :, 0]
 
             st.markdown(f"#### Global Importance ({model_name})")
-            fig_global = plt.figure()
+            plt.figure()
             shap.summary_plot(
                 shap_values.values,
                 df_unscaled,
                 feature_names=feature_names,
                 show=False,
             )
-            st.pyplot(fig_global, clear_figure=True)
+            st.pyplot(plt.gcf(), clear_figure=True)
 
             st.markdown(f"#### Local Explanation ({model_name})")
             patient_row = st.selectbox(
@@ -512,9 +569,9 @@ with tab4:
                 feature_names=feature_names,
             )
 
-            fig_local = plt.figure()
+            plt.figure()
             shap.plots.waterfall(local_exp, show=False)
-            st.pyplot(fig_local, clear_figure=True)
+            st.pyplot(plt.gcf(), clear_figure=True)
             st.caption(f"Red bars push the risk HIGHER ({POS_CLASS}), Blue bars push it LOWER ({NEG_CLASS}).")
 
         except Exception as e:
