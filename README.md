@@ -273,3 +273,5 @@ logs/
 ## License
 
 MIT License
+
+<p align="center">Made with ❤️ by Ahmad Mujtaba</p>
