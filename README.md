@@ -1,6 +1,6 @@
 # Breast-Cancer-Classification
 
-Production-oriented binary classification workflow with:
+Binary classification workflow with:
 - model training (`train_automl.py`),
 - model bundle persistence (`models_bundle.pkl`),
 - interactive inference/analysis UI (`app.py`),
@@ -20,23 +20,22 @@ streamlit run app.py
 
 ---
 
-## 1) Project Overview
+## 1) Project overview
 
 This repository implements a binary classification system centered on breast cancer data by default.
 
-What it does (from code):
+The code provides:
 - Trains five FLAML-based models (`lgbm`, `xgboost`, `rf`, `extra_tree`, `lrl1`) with a shared preprocessing pipeline.
 - Saves trained models, scaler, feature names, and metadata into a single bundle file.
 - Loads the bundle in a Streamlit app for batch inference, consensus voting, performance visualization, EDA, SHAP explanations, and per-model parameter inspection.
 
-Problem addressed:
-- Provide a single flow for training + interactive inference/analysis without manual model wiring in the UI.
+The training and inference steps share one bundle, so the UI does not need separate model wiring.
 
 ---
 
-## 2) Architecture Overview
+## 2) Architecture overview
 
-## Components
+### Components
 
 | Layer | File | Responsibilities |
 |---|---|---|
@@ -48,9 +47,9 @@ Note: `backend.py` is not present in this repository.
 
 ---
 
-## 3) System Flow
+## 3) System flow
 
-## End-to-end execution flow
+### End-to-end execution flow
 
 1. Configure training constants in `train_automl.py` (`DATA_SOURCE`, `TARGET_COLUMN`, `APP_TITLE`, `CLASS_LABELS`, `TIME_BUDGET`).
 2. Run training (`python train_automl.py`):
@@ -87,7 +86,7 @@ flowchart TD
 
 ---
 
-## 4) Workflow / Agent Logic
+## 4) Workflow and agent logic
 
 No workflow-engine or agent framework is implemented in this codebase.
 
@@ -97,9 +96,9 @@ Implemented control flow is procedural:
 
 ---
 
-## 5) Data Model / State Structure
+## 5) Data model and state structure
 
-## Persisted bundle structure (`models_bundle.pkl`)
+### Persisted bundle structure (`models_bundle.pkl`)
 
 | Key | Type | Purpose |
 |---|---|---|
@@ -108,7 +107,7 @@ Implemented control flow is procedural:
 | `feature_names` | `list[str]` | Canonical feature order used to align inference data |
 | `metadata` | `dict` | UI/training metadata: `title`, `class_labels`, `target_column` |
 
-## Runtime data objects in `app.py`
+### Runtime data objects in `app.py`
 
 | Variable | Type | Purpose |
 |---|---|---|
@@ -121,7 +120,7 @@ Implemented control flow is procedural:
 
 ---
 
-## 6) Core Modules Breakdown
+## 6) Core modules
 
 ## `train_automl.py`
 
@@ -144,7 +143,7 @@ Implemented control flow is procedural:
 
 ---
 
-## 7) Security Model
+## 7) Security model
 
 Implemented protections (code-level):
 - Bundle existence/load failure handling with user-facing stop conditions.
@@ -160,15 +159,15 @@ Security constraints not implemented:
 
 ---
 
-## 8) LLM / Provider Integration
+## 8) LLM and provider integration
 
 No LLM provider integration exists in this repository.
 
 ---
 
-## 9) Setup & Installation
+## 9) Setup and installation
 
-## Local environment (Windows PowerShell)
+### Local environment (Windows PowerShell)
 
 ```powershell
 python -m venv venv
@@ -176,13 +175,13 @@ venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
 
-## Training
+### Training
 
 ```bash
 python train_automl.py
 ```
 
-## Docker
+### Docker
 
 ```bash
 docker compose build
@@ -192,7 +191,7 @@ docker compose up
 
 ---
 
-## 10) Running the Application
+## 10) Running the application
 
 Start UI:
 
@@ -247,7 +246,7 @@ Code-observable constraints:
 
 ---
 
-## 13) Future Improvements (Grounded)
+## 13) Possible improvements
 
 Potential improvements directly implied by current code shape:
 - Add explicit multiclass handling in UI metrics/plots and probability adapter paths.
@@ -257,7 +256,7 @@ Potential improvements directly implied by current code shape:
 
 ---
 
-## Project Structure
+## Project structure
 
 ```text
 app.py

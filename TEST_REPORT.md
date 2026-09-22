@@ -1,9 +1,9 @@
-# TEST REPORT
+# Test report
 
 Date: 2026-03-01
 Project: Breast-Cancer-Classification
 
-## 1. System Overview
+## 1. System overview
 
 - Training entrypoint: `train_automl.py`
   - Loads dataset (`sklearn_breast_cancer` or CSV), splits, scales, trains FLAML models, evaluates, saves `models_bundle.pkl`.
@@ -21,13 +21,13 @@ Project: Breast-Cancer-Classification
   - Local: `streamlit run app.py`
   - Container: `Dockerfile`, `docker-compose.yml` service `classification-lab`
 
-## 2. Issues Found
+## 2. Issues found
 
-### Logic/ML correctness
+### Logic and ML correctness
 - Incorrect positive-class probability handling for `decision_function` models (class-0 semantics mismatch).
   - Evidence: fixed function path in `app.py` (`get_positive_proba`, decision-function branch now maps to class 0).
 
-### Robustness & error handling
+### Error handling
 - Bundle corruption/malformed bundle could fail without clear guard.
   - Evidence: `app.py` `load_bundle` now validates required keys and handles generic load exceptions.
 - CSV upload invalid payload handling (non-CSV bytes/parse errors) needed explicit user-safe failure path.
@@ -35,7 +35,7 @@ Project: Breast-Cancer-Classification
 - Empty/invalid feature input path needed explicit safeguards.
   - Evidence: `app.py` checks for empty features and scaling errors before inference.
 
-### Configuration/dependency/deployment
+### Configuration, dependencies, and deployment
 - Requirements had redundant/unused dependencies and less strict pin.
   - Evidence: `requirements.txt` cleaned to `flaml[automl]`, removed unused `openpyxl`/`fpdf`, pinned `numpy==2.3.0`, retained test deps.
 - Docker reliability/security mismatches.
@@ -43,7 +43,7 @@ Project: Breast-Cancer-Classification
     - `Dockerfile` now uses `python:3.13-slim` and ensures model generation if bundle missing.
     - `docker-compose.yml` renamed service to `classification-lab` and removed insecure flags (`--server.enableCORS=false`, `--server.enableXsrfProtection=false`).
 
-## 3. Tests Created
+## 3. Tests
 
 Test suite added under `tests/`:
 
@@ -57,18 +57,18 @@ Execution evidence:
 - Command: `./venv/Scripts/python.exe -m pytest tests/ -q`
 - Result (latest): **99 passed, 0 failed**
 
-## 4. Stress Results
+## 4. Stress results
 
 Executed stress scenarios (system + ML + data + UI):
 
-### Stress matrix summary
+### Stress matrix
 - Hard failures: **0**
 - Status counts: **PASS=10**, **PASS_EXPECTED_NEGATIVE=2**
 - Expected negative-path validations:
   - Missing model file -> `FileNotFoundError` (expected)
   - Corrupt model file -> load exception (expected)
 
-### Performance/stability observations
+### Performance and stability
 - Large CSV batch: processed **119,490 rows** (PASS)
 - Batch processing (all models): **69,987 rows across 5 models** in **0.868s** (PASS)
 - Repeated inference: **500 loops**, avg **20.705 ms** per loop (PASS)
@@ -77,7 +77,7 @@ Executed stress scenarios (system + ML + data + UI):
   - 300 requests, 300 OK, 0 failures
   - p50: 3.947 ms, p95: 27.408 ms, p99: 28.249 ms
 
-## 5. Fixes Applied
+## 5. Fixes
 
 ### `app.py`
 - Added robust bundle loading and key validation (`load_bundle`).
@@ -102,13 +102,13 @@ Executed stress scenarios (system + ML + data + UI):
 - Restored warning visibility (`warnings.filterwarnings("default")`).
 - Added hard stop if no model trains before bundle save.
 
-### Config/deps
+### Configuration and dependencies
 - `requirements.txt` cleaned and pinned (`numpy==2.3.0`), removed dead deps, kept test tooling.
 - `Dockerfile` updated for stable base image and startup model generation guard.
 - `docker-compose.yml` aligned service naming and safer Streamlit command.
 - `.gitignore` / `.dockerignore` updated for log/cache artifacts.
 
-## 6. Cleanup Done
+## 6. Cleanup
 
 Removed generated/dead artifacts from repo root:
 - `flaml_extra_tree.log`
@@ -124,14 +124,14 @@ Added ignore rules for future generated artifacts:
 - `.gitignore`: `*.log`, `logs/`
 - `.dockerignore`: `*.log`, `logs`, `*.pyc`, `**/__pycache__/`
 
-## 7. Final Stability
+## 7. Final status
 
 Final validation loop status:
 - Tests: **PASS** (99/99)
 - Stress matrix: **PASS** (0 hard failures)
 - UI rapid interaction stress: **PASS** (0 request failures)
 
-Conclusion (evidence-based):
+Conclusion:
 - No test regressions detected after fixes.
 - No unexpected crashes detected in exercised system/ML/data/UI paths.
 - Negative-path behaviors (missing/corrupt model) fail correctly and predictably.
