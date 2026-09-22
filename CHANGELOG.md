@@ -1,11 +1,10 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+This file records notable project changes. The project follows
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and aims to follow
+[Semantic Versioning](https://semver.org/).
 
-This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
-and aims to follow [Semantic Versioning](https://semver.org/).
-
-## [Unreleased]
+## Unreleased
 
 ### Added
 
@@ -13,8 +12,8 @@ and aims to follow [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
-## [2026-06-13]
+## 2026-06-13
 
 ### Added
 
-- OSS companion documentation initialized (license, contributing, security, conduct, changelog).
+- License, contributing, security, conduct, and changelog documentation.

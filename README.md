@@ -1,71 +1,80 @@
-# Breast-Cancer-Classification
+# Breast cancer classification
 
-Binary classification workflow with:
-- model training (`train_automl.py`),
-- model bundle persistence (`models_bundle.pkl`),
-- interactive inference/analysis UI (`app.py`),
-- automated test suite (`tests/`).
+This repository trains binary breast-cancer classifiers, stores them in a
+local Joblib bundle, and presents predictions and analysis in Streamlit. It
+contains the training script, dashboard, and test suite.
 
-## Quickstart
+## Start here
 
-```bash
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
-python train_automl.py
-streamlit run app.py
+```powershell
+uv sync
+uv run python train_automl.py
+uv run streamlit run app.py
 ```
 
-`app.py` requires `models_bundle.pkl`. If missing, run `python train_automl.py` first.
+The dashboard needs `models_bundle.pkl`. Create it by running the training
+command from the repository root.
 
----
+## Documentation
 
-## 1) Project overview
+| Document | When to use it |
+|---|---|
+| [Architecture and bundle reference](docs/architecture.md) | Learn how training, persistence, and inference fit together |
+| [Development and operations guide](docs/development.md) | Set up the project, run checks, use Docker, or troubleshoot the app |
+| [Foundation-model runbook](docs/foundation-models.md) | Install or run Mitra v2 and TabFM |
+| [ADR 0001: Local foundation models](docs/adr/0001-local-foundation-models.md) | Review the local-model decision and its tradeoffs |
+| [Test report](TEST_REPORT.md) | See the latest verified results and known limits |
 
-This repository implements a binary classification system centered on breast cancer data by default.
+## Optional foundation classifiers
 
-The code provides:
-- Trains five FLAML-based models (`lgbm`, `xgboost`, `rf`, `extra_tree`, `lrl1`) with a shared preprocessing pipeline.
-- Saves trained models, scaler, feature names, and metadata into a single bundle file.
-- Loads the bundle in a Streamlit app for batch inference, consensus voting, performance visualization, EDA, SHAP explanations, and per-model parameter inspection.
+Mitra v2 and TabFM are optional local research classifiers. The regressor
+checkpoints do not apply to this binary target.
 
-The training and inference steps share one bundle, so the UI does not need separate model wiring.
+```powershell
+uv sync --extra foundation
+uv run python train_automl.py --foundation-models mitra tabfm --accept-tabfm-noncommercial-license
+uv run streamlit run app.py
+```
 
----
+Mitra uses `autogluon/mitra-classifier-2` with `fine_tune=False`. The code uses
+CUDA when the installed PyTorch runtime exposes it and retries on CPU after a
+CUDA out-of-memory error. TabFM uses its PyTorch classifier on CPU, with four
+estimators and at most 100 context rows. This path avoids the JAX/Orbax
+checkpoint-allocation failure seen on Windows.
 
-## 2) Architecture overview
+TabFM weights use the `tabfm-non-commercial-v1.0` license and are limited to
+noncommercial, nonproduction research. The acceptance flag is required before
+the checkpoint download. Mitra code and weights use Apache-2.0. Hugging Face
+caches checkpoints; generated AutoGluon files stay in ignored
+`model_artifacts/`.
 
-### Components
+## What the project does
 
-| Layer | File | Responsibilities |
+By default, `train_automl.py` loads the scikit-learn breast-cancer dataset. It
+splits and scales the data, searches five FLAML estimators, optionally retains
+the strongest LazyPredict classifiers, evaluates them, and writes one bundle.
+The dashboard reads that bundle for batch predictions, consensus results,
+metrics, EDA, SHAP views for compatible models, and model parameters.
+
+| Layer | File | Responsibility |
 |---|---|---|
-| UI layer | `app.py` | Load bundle, parse input data, align features, run inference, compute metrics/charts, render Streamlit tabs |
-| Backend/training logic | `train_automl.py` | Load dataset, split/scale, train FLAML models, evaluate metrics, persist bundle |
-| Tests | `tests/*` | Unit/integration/edge checks for training logic, bundle integrity, inference behavior |
+| Dashboard | `app.py` | Loads the bundle, aligns inputs, runs inference, and renders Streamlit views |
+| Training | `train_automl.py` | Loads and scales data, trains classifiers, evaluates them, and writes the bundle |
+| Foundation adapters | `foundation_models.py` | Lazily exposes Mitra and TabFM through the dashboard model interface |
+| Tests | `tests/` | Covers training, bundle integrity, inference, edge cases, and foundation adapters |
 
-Note: `backend.py` is not present in this repository.
+`backend.py` is not part of this repository. The application does not use an
+agent framework or an LLM provider.
 
----
+## How data moves through the app
 
-## 3) System flow
-
-### End-to-end execution flow
-
-1. Configure training constants in `train_automl.py` (`DATA_SOURCE`, `TARGET_COLUMN`, `APP_TITLE`, `CLASS_LABELS`, `TIME_BUDGET`).
-2. Run training (`python train_automl.py`):
-   - load dataset,
-   - split train/test,
-   - fit `StandardScaler`,
-   - train FLAML models,
-   - evaluate,
-   - write `models_bundle.pkl`.
-3. Run UI (`streamlit run app.py`):
-   - load and validate bundle,
-   - load data (uploaded CSV or sklearn sample),
-   - align columns to bundle feature set,
-   - scale features,
-   - produce predictions/probabilities,
-   - render analysis tabs.
+1. Set `DATA_SOURCE`, `TARGET_COLUMN`, `APP_TITLE`, `CLASS_LABELS`, and
+   `TIME_BUDGET` in `train_automl.py` when you need a dataset other than the
+   built-in sample.
+2. Run `uv run python train_automl.py` to load data, split it, fit the scaler,
+   train classifiers, evaluate them, and write `models_bundle.pkl`.
+3. Run `uv run streamlit run app.py` to load the bundle, read an uploaded CSV
+   or sample data, align features, transform values, and show results.
 
 ```mermaid
 flowchart TD
@@ -84,185 +93,102 @@ flowchart TD
     M --> N[Consensus / Metrics / EDA / SHAP / Specs tabs]
 ```
 
----
-
-## 4) Workflow and agent logic
-
-No workflow-engine or agent framework is implemented in this codebase.
-
-Implemented control flow is procedural:
-- training loop over fixed estimator map in `train_automl.py`,
-- UI branch logic via Streamlit controls and conditional blocks in `app.py`.
-
----
-
-## 5) Data model and state structure
-
-### Persisted bundle structure (`models_bundle.pkl`)
+## Bundle contents
 
 | Key | Type | Purpose |
 |---|---|---|
-| `models` | `dict[str, AutoML]` | Trained FLAML model objects keyed by display name |
-| `scaler` | `StandardScaler` | Feature scaling object used during training/inference |
-| `feature_names` | `list[str]` | Canonical feature order used to align inference data |
-| `metadata` | `dict` | UI/training metadata: `title`, `class_labels`, `target_column` |
+| `models` | `dict[str, classifier]` | Trained classifiers keyed by display name |
+| `scaler` | `StandardScaler` | Fitted transformation used during training and inference |
+| `feature_names` | `list[str]` | Feature names and their required order |
+| `metadata` | `dict` | Title, class labels, target name, model provenance, and research-only state |
 
-### Runtime data objects in `app.py`
+`app.py` uses the stored feature order when it receives data. Its main runtime
+objects are the raw DataFrame (`df`), optional ground-truth labels (`labels`),
+aligned features (`df_features`), scaled values (`X_scaled`), per-model labels
+(`model_predictions`), and displayed results (`results_table`).
 
-| Variable | Type | Purpose |
-|---|---|---|
-| `df` | `DataFrame` | Raw loaded dataset |
-| `labels` | `Series` or `None` | Ground-truth target when available |
-| `df_features` | `DataFrame` | Features used for inference after `target` drop/reindex |
-| `X_scaled` | `ndarray` | Scaled features fed into models |
-| `model_predictions` | `DataFrame` | Per-model class labels for consensus |
-| `results_table` | `DataFrame` | Display table with consensus score/diagnosis |
+## Main functions
 
----
+### `train_automl.py`
 
-## 6) Core modules
+| Function | Purpose |
+|---|---|
+| `load_data()` | Loads the configured scikit-learn dataset or CSV |
+| `train_flaml_model(...)` | Runs a FLAML classification search using ROC-AUC and an estimator-specific log file |
+| `evaluate_models(...)` | Calculates accuracy, malignant-class recall, precision, and F1 |
+| `train_foundation_models(...)` | Downloads pinned checkpoints and prepares requested Mitra or TabFM adapters |
+| `main(argv=None)` | Runs training from data loading through bundle persistence |
 
-## `train_automl.py`
+### `app.py`
 
-| Function | Input | Output | Behavior |
-|---|---|---|---|
-| `load_data()` | none (uses config constants) | `DataFrame` | Loads sklearn breast cancer dataset or CSV path from `DATA_SOURCE` |
-| `train_flaml_model(x_train, y_train, estimator_name, time_budget)` | scaled features, labels, estimator id, budget | `AutoML` | Runs FLAML with `metric='roc_auc'`, classification task, logs to `logs/flaml_<estimator>.log` |
-| `evaluate_models(models, x_test, y_test)` | model dict + test data | `DataFrame` | Computes Accuracy, Recall (pos_label=0), Precision (pos_label=0), F1 (pos_label=0) |
-| `main()` | none | none | Full pipeline: load → split → scale → train loop → evaluate → save bundle |
+| Function | Purpose |
+|---|---|
+| `load_bundle()` | Loads and validates `models_bundle.pkl` |
+| `compute_pca(...)` | Builds the two-dimensional PCA view |
+| `get_positive_proba(...)` | Returns class-0 probability from supported classifier interfaces |
+| `load_dataframe_from_sklearn()` | Builds the default sample DataFrame |
+| `load_dataframe_from_upload(...)` | Parses an uploaded CSV and raises controlled parser errors |
 
-## `app.py`
+## Security and limits
 
-| Function | Input | Output | Behavior |
-|---|---|---|---|
-| `load_bundle()` | none | `dict` | Loads `models_bundle.pkl`; validates required keys (`models`, `scaler`, `feature_names`) |
-| `compute_pca(x_scaled, labels=None)` | scaled features, optional labels | `(DataFrame, ndarray)` | Computes 2D PCA and optional diagnosis label column |
-| `get_positive_proba(model, x)` | model, feature matrix | `ndarray` | Returns class-0 probability, using `predict_proba` or transformed `decision_function` |
-| `load_dataframe_from_sklearn()` | none | `DataFrame` | Loads sklearn breast cancer dataset as frame with `target` |
-| `load_dataframe_from_upload(uploaded_file)` | uploaded file object | `DataFrame` | Parses CSV and raises `ValueError` on CSV parser/encoding errors |
+The dashboard checks bundle keys, handles bundle-load errors, reports CSV parser
+errors, warns about missing or extra columns, and reports scaling errors.
 
----
+It has no authentication, authorization, sandbox for model deserialization, or
+network/API access controls. `joblib.load("models_bundle.pkl")` is a trust
+boundary; load only artifacts you created or trust.
 
-## 7) Security model
+The UI expects a binary target with classes `0` and `1`. When an input includes
+`target`, the code converts it with `df["target"].astype(int)`. Tree SHAP covers
+tree-compatible models only. Dataset and FLAML settings remain module-level
+constants; the CLI selects optional foundation models and records TabFM license
+acceptance.
 
-Implemented protections (code-level):
-- Bundle existence/load failure handling with user-facing stop conditions.
-- Bundle schema check for required keys before UI continues.
-- CSV parsing error handling for empty/invalid/encoding cases.
-- Feature alignment to trained schema via reindex (`fill_value=0`), plus warnings for missing/extra columns.
-- Scaling exceptions are caught and shown to user.
+## Run and test
 
-Security constraints not implemented:
-- No authentication/authorization.
-- No sandboxing for model file loading (pickle/joblib trust boundary remains).
-- No network/API access control logic in app code.
-
----
-
-## 8) LLM and provider integration
-
-No LLM provider integration exists in this repository.
-
----
-
-## 9) Setup and installation
-
-### Local environment (Windows PowerShell)
+Install the local environment:
 
 ```powershell
-python -m venv venv
-venv\Scripts\Activate.ps1
-pip install -r requirements.txt
+uv sync
 ```
 
-### Training
+Run the test suite:
 
-```bash
-python train_automl.py
+```powershell
+uv run pytest tests/ -q
 ```
 
-### Docker
+The suite covers training and metrics, app helpers, bundle and SHAP behavior,
+edge conditions, and shared fixtures.
 
-```bash
+To use Docker for the classical application:
+
+```powershell
 docker compose build
-docker compose run --rm classification-lab python train_automl.py
+docker compose run --rm classification-lab uv run --no-sync python train_automl.py
 docker compose up
 ```
 
----
+The dashboard includes controls for model selection, threshold tuning, data
+source selection, and single-row prediction. Its five tabs cover consensus
+diagnosis, ranking and performance, EDA, model explainability, and model specs.
 
-## 10) Running the application
+## Possible next steps
 
-Start UI:
+- Add multiclass handling to UI metrics, plots, and the probability adapter.
+- Add a config file or CLI options for dataset and FLAML settings.
+- Add a bundle schema version and stronger compatibility checks.
+- Import app functions directly in more tests rather than copying their logic.
 
-```bash
-streamlit run app.py
-```
-
-What the user sees:
-- Sidebar controls for model selection, threshold tuning, data source, and manual single-row prediction.
-- Five tabs:
-  1. Consensus Diagnosis
-  2. Ranking & Performance
-  3. Deep EDA
-  4. Model Explainability (SHAP)
-  5. Model Specs
-
-Expected behavior:
-- If `models_bundle.pkl` is missing or invalid, app shows error and stops.
-- If uploaded CSV does not parse, app shows error and stops.
-- If `target` column is present, performance metrics/ROC/confusion matrix are enabled.
-
----
-
-## 11) Testing
-
-Framework:
-- `pytest` (with `pytest-cov` installed in dependencies).
-
-Run tests:
-
-```bash
-python -m pytest tests/ -q
-```
-
-Test suite includes:
-- training pipeline and metric tests (`tests/test_train_automl.py`),
-- utility/inference helper tests (`tests/test_app_utils.py`),
-- bundle/pipeline/SHAP tests (`tests/test_ml_pipeline.py`),
-- edge-condition tests (`tests/test_edge_cases.py`),
-- shared fixtures (`tests/conftest.py`).
-
----
-
-## 12) Limitations
-
-Code-observable constraints:
-- Current UI logic is binary-class oriented (`0` and `1` expected in class labels and confusion matrix).
-- `labels = df["target"].astype(int)` assumes integer-convertible target values when `target` exists.
-- SHAP path is implemented through `TreeExplainer`; non-tree explainability is not implemented.
-- `joblib.load("models_bundle.pkl")` requires trusted model artifacts.
-- Training uses module-level constants; no CLI argument parser is implemented.
-
----
-
-## 13) Possible improvements
-
-Potential improvements directly implied by current code shape:
-- Add explicit multiclass handling in UI metrics/plots and probability adapter paths.
-- Add CLI arguments or config-file loading for training parameters.
-- Add stronger bundle schema/version validation (beyond required keys).
-- Extend tests to import real app functions directly instead of copied function bodies.
-
----
-
-## Project structure
+## Project layout
 
 ```text
 app.py
 train_automl.py
+foundation_models.py
 models_bundle.pkl
-requirements.txt
+pyproject.toml
+uv.lock
 Dockerfile
 docker-compose.yml
 tests/
@@ -273,4 +199,4 @@ logs/
 
 MIT License
 
-<p align="center">Made with ❤️ by Ahmad Mujtaba</p>
+Created by Ahmad Mujtaba.

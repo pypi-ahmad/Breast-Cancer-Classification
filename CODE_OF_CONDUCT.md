@@ -1,38 +1,24 @@
-# Code of Conduct
+# Code of conduct
 
-## Our Pledge
+This project should be a place where people can participate without harassment.
 
-We are committed to making participation in this project a harassment-free experience for everyone.
+## Expected conduct
 
-## Our Standards
+Be respectful and constructive. Give feedback in good faith, receive it the
+same way, and keep the work focused on the project and its community.
 
-Examples of behavior that contributes to a positive environment:
+## Unacceptable conduct
 
-- Being respectful and constructive
-- Giving and accepting feedback gracefully
-- Focusing on what is best for the community
+Harassment, discrimination, personal attacks, trolling, derogatory comments,
+and publishing private information without permission are not acceptable.
 
-Examples of unacceptable behavior:
+## Scope and enforcement
 
-- Harassment, discrimination, or personal attacks
-- Trolling, insulting, or derogatory comments
-- Publishing private information without permission
+This policy applies to project spaces, including issues, pull requests, and
+community discussions. Maintainers clarify and enforce the policy. They may
+issue a warning, temporarily ban a participant, or permanently remove access.
 
-## Enforcement Responsibilities
+## Report conduct issues
 
-Project maintainers are responsible for clarifying and enforcing acceptable behavior.
-
-## Scope
-
-This Code of Conduct applies in all project spaces, including issues, pull requests,
-and community discussions.
-
-## Reporting
-
-To report behavior that violates this Code of Conduct, open a GitHub Issue in this repository.
-Maintainers will review and respond appropriately.
-
-## Enforcement
-
-Maintainers may take any action they deem appropriate, including warning, temporary ban,
-or permanent removal from participation.
+Open a GitHub Issue to report conduct that violates this policy. Maintainers
+will review the report and respond appropriately.

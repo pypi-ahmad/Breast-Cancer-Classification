@@ -47,7 +47,7 @@ def load_bundle():
     try:
         bundle_data = joblib.load("models_bundle.pkl")
     except FileNotFoundError:
-        st.error("⚠️ Model bundle not found. Run 'python train_automl.py' first to initialize the engine.")
+        st.error("⚠️ Model bundle not found. Run 'uv run python train_automl.py' first.")
         st.stop()
     except Exception as exc:
         st.error(f"⚠️ Failed to load model bundle: {exc}")
@@ -85,6 +85,12 @@ if 0 not in CLASS_LABELS or 1 not in CLASS_LABELS:
     st.stop()
 POS_CLASS = CLASS_LABELS[0]
 NEG_CLASS = CLASS_LABELS[1]
+
+if metadata.get("research_only"):
+    st.warning(
+        "This bundle includes TabFM weights licensed only for noncommercial, "
+        "nonproduction research use."
+    )
 
 # --- PCA Helper ---
 @st.cache_data
@@ -534,48 +540,51 @@ with tab4:
         elif hasattr(model_obj, 'estimator'):
             native_model = model_obj.estimator
         
-        try:
+        if getattr(model_obj, "supports_tree_shap", True) is False:
+            st.info("Tree SHAP is not supported for this foundation model.")
+        else:
+            try:
             # Attempt to create a TreeExplainer (works for XGBoost, LightGBM, RF, etc.)
-            explainer = shap.TreeExplainer(native_model)
-            shap_values = explainer(X_scaled)
+                explainer = shap.TreeExplainer(native_model)
+                shap_values = explainer(X_scaled)
             
             # Fix: Random Forest returns 3D structure (samples, features, classes).
             # We slice to keep only the Positive Class (index 0 for Malignant in this app).
-            if shap_values.values.ndim == 3:
-                shap_values = shap_values[:, :, 0]
+                if shap_values.values.ndim == 3:
+                    shap_values = shap_values[:, :, 0]
 
-            st.markdown(f"#### Global Importance ({model_name})")
-            plt.figure()
-            shap.summary_plot(
-                shap_values.values,
-                df_unscaled,
-                feature_names=feature_names,
-                show=False,
-            )
-            st.pyplot(plt.gcf(), clear_figure=True)
+                st.markdown(f"#### Global Importance ({model_name})")
+                plt.figure()
+                shap.summary_plot(
+                    shap_values.values,
+                    df_unscaled,
+                    feature_names=feature_names,
+                    show=False,
+                )
+                st.pyplot(plt.gcf(), clear_figure=True)
 
-            st.markdown(f"#### Local Explanation ({model_name})")
-            patient_row = st.selectbox(
-                "Select Patient Row",
-                options=list(range(len(df_unscaled))),
-                index=0,
-                key="shap_patient_row",
-            )
+                st.markdown(f"#### Local Explanation ({model_name})")
+                patient_row = st.selectbox(
+                    "Select Patient Row",
+                    options=list(range(len(df_unscaled))),
+                    index=0,
+                    key="shap_patient_row",
+                )
 
-            local_exp = shap.Explanation(
-                values=shap_values.values[patient_row],
-                base_values=shap_values.base_values[patient_row],
-                data=df_unscaled.iloc[patient_row].values,
-                feature_names=feature_names,
-            )
+                local_exp = shap.Explanation(
+                    values=shap_values.values[patient_row],
+                    base_values=shap_values.base_values[patient_row],
+                    data=df_unscaled.iloc[patient_row].values,
+                    feature_names=feature_names,
+                )
 
-            plt.figure()
-            shap.plots.waterfall(local_exp, show=False)
-            st.pyplot(plt.gcf(), clear_figure=True)
-            st.caption(f"Red bars push the risk HIGHER ({POS_CLASS}), Blue bars push it LOWER ({NEG_CLASS}).")
+                plt.figure()
+                shap.plots.waterfall(local_exp, show=False)
+                st.pyplot(plt.gcf(), clear_figure=True)
+                st.caption(f"Red bars push the risk HIGHER ({POS_CLASS}), Blue bars push it LOWER ({NEG_CLASS}).")
 
-        except Exception as e:
-            st.warning(f"SHAP failed: {e}. This model might not be tree-based (e.g. SVM, Logistic Regression).")
+            except Exception as e:
+                st.warning(f"SHAP failed: {e}. This model might not be tree-based (e.g. SVM, Logistic Regression).")
 
 # --- TAB 5: Model Specs ---
 with tab5:

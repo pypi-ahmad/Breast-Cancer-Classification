@@ -1,49 +1,52 @@
 # Test report
 
-Date: 2026-03-01
+Date: 2026-09-22
 Project: Breast-Cancer-Classification
 
-## 1. System overview
+## System overview
 
 - Training entrypoint: `train_automl.py`
-  - Loads dataset (`sklearn_breast_cancer` or CSV), splits, scales, trains FLAML models, evaluates, saves `models_bundle.pkl`.
-  - Evidence:
+  - Loads `sklearn_breast_cancer` or a CSV, splits and scales the data, trains FLAML models, can add the leading LazyPredict classifiers, evaluates them, and saves `models_bundle.pkl`.
+  - Source locations:
     - Data load path: `train_automl.py` (`load_data`)
     - Model training loop: `train_automl.py` (`model_types`, `train_flaml_model`)
     - Bundle save: `train_automl.py` (`joblib.dump(bundle, "models_bundle.pkl")`)
 - Inference entrypoint: `app.py`
-  - Loads `models_bundle.pkl`, aligns/normalizes input features, computes model predictions, consensus diagnosis, metrics, EDA, SHAP explainability.
-  - Evidence:
+  - Loads `models_bundle.pkl`, aligns and normalizes input features, then calculates predictions, consensus diagnosis, metrics, EDA, and SHAP output.
+  - Source locations:
     - Bundle load/validation: `app.py` (`load_bundle`)
     - Inference probability adapter: `app.py` (`get_positive_proba`)
     - Feature alignment/scaling: `app.py` (`reindex(..., fill_value=0)` + `scaler.transform`)
 - Runtime/deployment:
-  - Local: `streamlit run app.py`
+  - Local: `uv run streamlit run app.py`
   - Container: `Dockerfile`, `docker-compose.yml` service `classification-lab`
 
-## 2. Issues found
+## Issues found
 
 ### Logic and ML correctness
-- Incorrect positive-class probability handling for `decision_function` models (class-0 semantics mismatch).
-  - Evidence: fixed function path in `app.py` (`get_positive_proba`, decision-function branch now maps to class 0).
+
+- `decision_function` models previously handled the positive-class probability incorrectly for class `0`.
+  - Evidence: `app.py` now maps the decision-function path in `get_positive_proba` to class `0`.
 
 ### Error handling
-- Bundle corruption/malformed bundle could fail without clear guard.
-  - Evidence: `app.py` `load_bundle` now validates required keys and handles generic load exceptions.
-- CSV upload invalid payload handling (non-CSV bytes/parse errors) needed explicit user-safe failure path.
-  - Evidence: `app.py` `load_dataframe_from_upload` now catches `EmptyDataError`, `ParserError`, `UnicodeDecodeError` and raises controlled `ValueError`.
-- Empty/invalid feature input path needed explicit safeguards.
+
+- A corrupt or malformed bundle could fail without a clear guard.
+  - Evidence: `load_bundle` validates required keys and handles generic load exceptions.
+- Invalid CSV payloads needed a controlled failure path.
+  - Evidence: `load_dataframe_from_upload` catches `EmptyDataError`, `ParserError`, and `UnicodeDecodeError`, then raises `ValueError`.
+- Empty or invalid feature input needed explicit checks.
   - Evidence: `app.py` checks for empty features and scaling errors before inference.
 
 ### Configuration, dependencies, and deployment
-- Requirements had redundant/unused dependencies and less strict pin.
-  - Evidence: `requirements.txt` cleaned to `flaml[automl]`, removed unused `openpyxl`/`fpdf`, pinned `numpy==2.3.0`, retained test deps.
-- Docker reliability/security mismatches.
+
+- The old requirements list contained redundant dependencies and a less strict pin.
+  - Evidence: `pyproject.toml` defines runtime and test dependencies, pins `numpy==2.3.0`, and removes `openpyxl` and `fpdf`.
+- Docker configuration had reliability and security mismatches.
   - Evidence:
     - `Dockerfile` now uses `python:3.13-slim` and ensures model generation if bundle missing.
     - `docker-compose.yml` renamed service to `classification-lab` and removed insecure flags (`--server.enableCORS=false`, `--server.enableXsrfProtection=false`).
 
-## 3. Tests
+## Tests
 
 Test suite added under `tests/`:
 
@@ -52,16 +55,27 @@ Test suite added under `tests/`:
 - `tests/test_app_utils.py` (app utility logic tests)
 - `tests/test_ml_pipeline.py` (model/bundle/SHAP/pipeline tests)
 - `tests/test_edge_cases.py` (empty/wrong schema/missing-corrupt model/nulls/threshold boundaries)
+- `tests/test_foundation_models.py` (adapter, serialization, probability, and license-gate contracts)
 
-Execution evidence:
-- Command: `./venv/Scripts/python.exe -m pytest tests/ -q`
-- Result (latest): **99 passed, 0 failed**
+Execution:
 
-## 4. Stress results
+- Command: `uv run pytest tests/ -q`
+- Result (latest): **106 passed, 0 failed**
+- Streamlit smoke: `/_stcore/health` returned `ok` on port 8596.
 
-Executed stress scenarios (system + ML + data + UI):
+### Foundation-model run
+
+- `uv sync --extra foundation`: passed with the pinned AutoGluon, TabFM, PyTorch, and checkpoint dependencies.
+- Mitra v2 classifier: passed training and test-set inference on CPU. AutoGluon reported 0.978 validation accuracy and a 306.67-second fit.
+- TabFM classifier checkpoint: the pinned 6.56 GB PyTorch classification checkpoint downloaded successfully.
+- TabFM inference: blocked during local weight restore with Windows error 1455: `The paging file is too small for this operation to complete.` The earlier JAX path was also rejected because Orbax could not allocate a 1.50 GB memory region. No TabFM metric or completed foundation bundle is claimed.
+
+## Stress results
+
+Stress scenarios covered the system, ML path, data path, and UI.
 
 ### Stress matrix
+
 - Hard failures: **0**
 - Status counts: **PASS=10**, **PASS_EXPECTED_NEGATIVE=2**
 - Expected negative-path validations:
@@ -69,6 +83,7 @@ Executed stress scenarios (system + ML + data + UI):
   - Corrupt model file -> load exception (expected)
 
 ### Performance and stability
+
 - Large CSV batch: processed **119,490 rows** (PASS)
 - Batch processing (all models): **69,987 rows across 5 models** in **0.868s** (PASS)
 - Repeated inference: **500 loops**, avg **20.705 ms** per loop (PASS)
@@ -77,40 +92,45 @@ Executed stress scenarios (system + ML + data + UI):
   - 300 requests, 300 OK, 0 failures
   - p50: 3.947 ms, p95: 27.408 ms, p99: 28.249 ms
 
-## 5. Fixes
+## Fixes
 
 ### `app.py`
-- Added robust bundle loading and key validation (`load_bundle`).
+
+- Added bundle loading and key validation in `load_bundle`.
 - Normalized `class_labels` keys to `int` and validated keys `0/1`.
 - Corrected `get_positive_proba` class-0 mapping for:
   - `predict_proba` using `model.classes_` when available
   - `decision_function` binary/multiclass handling
-- Added safe CSV parser error handling in `load_dataframe_from_upload`.
+- Added controlled CSV parser errors in `load_dataframe_from_upload`.
 - Added feature/schema safeguards:
   - warns on missing/extra columns
   - guards empty inputs
   - catches scaler transform failures
 - Replaced invalid Streamlit width usage with `use_container_width=True`.
 - Hardened EDA correlation calls with `numeric_only=True`.
-- Stabilized SHAP rendering using current matplotlib figure (`plt.gcf()`).
+- Rendered SHAP output through the current matplotlib figure (`plt.gcf()`).
 
 ### `train_automl.py`
-- Added robust non-file CSV load exception wrapping.
+
+- Added clear exception wrapping for CSV load failures.
 - Moved FLAML logs to `logs/` directory.
 - Corrected training output label from “Best accuracy” to “Best ROC-AUC”.
 - Added `zero_division=0` to precision/recall/F1 metric calls.
-- Restored warning visibility (`warnings.filterwarnings("default")`).
+- Restored warning visibility with `warnings.filterwarnings("default")`.
 - Added hard stop if no model trains before bundle save.
+- Added pinned Mitra and TabFM classifier adapters, explicit TabFM license acceptance, model provenance, and runtime release between foundation models.
 
 ### Configuration and dependencies
-- `requirements.txt` cleaned and pinned (`numpy==2.3.0`), removed dead deps, kept test tooling.
+
+- `pyproject.toml` and `uv.lock` now define and lock runtime and test dependencies, including `numpy==2.3.0`.
 - `Dockerfile` updated for stable base image and startup model generation guard.
 - `docker-compose.yml` aligned service naming and safer Streamlit command.
 - `.gitignore` / `.dockerignore` updated for log/cache artifacts.
 
-## 6. Cleanup
+## Cleanup
 
-Removed generated/dead artifacts from repo root:
+Removed generated artifacts from the repository root:
+
 - `flaml_extra_tree.log`
 - `flaml_lgbm.log`
 - `flaml_lrl1.log`
@@ -120,18 +140,19 @@ Removed generated/dead artifacts from repo root:
 - `.pytest_cache/`
 - `.pytest_full_output.txt`
 
-Added ignore rules for future generated artifacts:
+Added ignore rules for generated artifacts:
+
 - `.gitignore`: `*.log`, `logs/`
 - `.dockerignore`: `*.log`, `logs`, `*.pyc`, `**/__pycache__/`
 
-## 7. Final status
+## Final status
 
-Final validation loop status:
-- Tests: **PASS** (99/99)
+Validation status:
+
+- Tests: **PASS** (106/106)
+- Mitra end-to-end: **PASS**
+- TabFM end-to-end: **BLOCKED by Windows paging-file capacity during weight restore**
 - Stress matrix: **PASS** (0 hard failures)
 - UI rapid interaction stress: **PASS** (0 request failures)
 
-Conclusion:
-- No test regressions detected after fixes.
-- No unexpected crashes detected in exercised system/ML/data/UI paths.
-- Negative-path behaviors (missing/corrupt model) fail correctly and predictably.
+The tests found no regressions. The classical and Mitra paths passed. TabFM remains unavailable on this machine until the Windows paging file has more capacity. Missing and corrupt model paths fail predictably.

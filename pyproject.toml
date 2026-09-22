@@ -1,0 +1,29 @@
+[project]
+name = "breast-cancer-classification"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "flaml[automl]>=2.7.0",
+    "joblib>=1.6.0",
+    "lazypredict>=0.3.0",
+    "matplotlib>=3.11.2",
+    "numpy==2.3.0",
+    "pandas>=2.3.3",
+    "plotly>=7.1.0",
+    "scikit-learn>=1.9.1",
+    "shap>=0.52.0",
+    "streamlit>=1.64.0",
+]
+
+[project.optional-dependencies]
+foundation = [
+    "autogluon.tabular[mitra]==1.6.3",
+    "tabfm[pytorch] @ git+https://github.com/google-research/tabfm.git@d8678b6895f1428a468d4cc299c1ff4cf704e726",
+    "truststore>=0.10.4",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+]
