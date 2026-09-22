@@ -3,6 +3,7 @@ models_bundle.pkl
 *.pkl
 *.log
 logs/
+model_artifacts/
 
 # Python
 __pycache__/
@@ -11,6 +12,7 @@ __pycache__/
 .venv/
 venv/
 env/
+.codegraph/
 
 # Data (Protect user privacy)
 *.csv
