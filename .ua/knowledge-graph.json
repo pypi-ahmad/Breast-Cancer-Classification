@@ -1,0 +1,1034 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "Breast-Cancer-Classification",
+    "languages": [
+      "dockerfile",
+      "markdown",
+      "pkl",
+      "python",
+      "txt",
+      "yaml"
+    ],
+    "frameworks": [
+      "Python",
+      "Streamlit",
+      "Docker",
+      "Docker Compose"
+    ],
+    "description": "A breast cancer classification application with a Streamlit interface, bundled models, training utilities, tests, and container deployment configuration.",
+    "analyzedAt": "2026-09-22T07:37:29.107Z",
+    "gitCommitHash": "05a0ccfb5da3e322f3c08b0716a1b900dc230f1e"
+  },
+  "nodes": [
+    {
+      "id": "config:.dockerignore",
+      "type": "config",
+      "name": ".dockerignore",
+      "filePath": ".dockerignore",
+      "summary": "infra file containing 7 lines.",
+      "tags": [
+        "infra",
+        "unknown"
+      ]
+    },
+    {
+      "id": "file:.gitattributes",
+      "type": "file",
+      "name": ".gitattributes",
+      "filePath": ".gitattributes",
+      "summary": "code file containing 2 lines.",
+      "tags": [
+        "code",
+        "unknown"
+      ]
+    },
+    {
+      "id": "file:.ua/.understandignore",
+      "type": "file",
+      "name": ".understandignore",
+      "filePath": ".ua/.understandignore",
+      "summary": "code file containing 75 lines.",
+      "tags": [
+        "code",
+        "unknown"
+      ]
+    },
+    {
+      "id": "document:CHANGELOG.md",
+      "type": "document",
+      "name": "CHANGELOG.md",
+      "filePath": "CHANGELOG.md",
+      "summary": "docs file containing 20 lines.",
+      "tags": [
+        "docs",
+        "markdown"
+      ]
+    },
+    {
+      "id": "document:CODE_OF_CONDUCT.md",
+      "type": "document",
+      "name": "CODE_OF_CONDUCT.md",
+      "filePath": "CODE_OF_CONDUCT.md",
+      "summary": "docs file containing 38 lines.",
+      "tags": [
+        "docs",
+        "markdown"
+      ]
+    },
+    {
+      "id": "service:Dockerfile",
+      "type": "service",
+      "name": "Dockerfile",
+      "filePath": "Dockerfile",
+      "summary": "infra file containing 17 lines.",
+      "tags": [
+        "infra",
+        "dockerfile"
+      ]
+    },
+    {
+      "id": "document:README.md",
+      "type": "document",
+      "name": "README.md",
+      "filePath": "README.md",
+      "summary": "docs file containing 277 lines.",
+      "tags": [
+        "docs",
+        "markdown"
+      ]
+    },
+    {
+      "id": "document:SECURITY.md",
+      "type": "document",
+      "name": "SECURITY.md",
+      "filePath": "SECURITY.md",
+      "summary": "docs file containing 24 lines.",
+      "tags": [
+        "docs",
+        "markdown"
+      ]
+    },
+    {
+      "id": "document:TEST_REPORT.md",
+      "type": "document",
+      "name": "TEST_REPORT.md",
+      "filePath": "TEST_REPORT.md",
+      "summary": "docs file containing 137 lines.",
+      "tags": [
+        "docs",
+        "markdown"
+      ]
+    },
+    {
+      "id": "file:app.py",
+      "type": "file",
+      "name": "app.py",
+      "filePath": "app.py",
+      "summary": "code file containing 594 lines.",
+      "tags": [
+        "code",
+        "python"
+      ]
+    },
+    {
+      "id": "service:docker-compose.yml",
+      "type": "service",
+      "name": "docker-compose.yml",
+      "filePath": "docker-compose.yml",
+      "summary": "infra file containing 10 lines.",
+      "tags": [
+        "infra",
+        "yaml"
+      ]
+    },
+    {
+      "id": "file:models_bundle.pkl",
+      "type": "file",
+      "name": "models_bundle.pkl",
+      "filePath": "models_bundle.pkl",
+      "summary": "code file containing 4817 lines.",
+      "tags": [
+        "code",
+        "pkl"
+      ]
+    },
+    {
+      "id": "document:requirements.txt",
+      "type": "document",
+      "name": "requirements.txt",
+      "filePath": "requirements.txt",
+      "summary": "docs file containing 11 lines.",
+      "tags": [
+        "docs",
+        "txt"
+      ]
+    },
+    {
+      "id": "file:tests/__init__.py",
+      "type": "file",
+      "name": "__init__.py",
+      "filePath": "tests/__init__.py",
+      "summary": "code file containing 0 lines.",
+      "tags": [
+        "code",
+        "python"
+      ]
+    },
+    {
+      "id": "file:tests/conftest.py",
+      "type": "file",
+      "name": "conftest.py",
+      "filePath": "tests/conftest.py",
+      "summary": "code file containing 113 lines.",
+      "tags": [
+        "code",
+        "python"
+      ]
+    },
+    {
+      "id": "file:tests/test_app_utils.py",
+      "type": "file",
+      "name": "test_app_utils.py",
+      "filePath": "tests/test_app_utils.py",
+      "summary": "code file containing 330 lines.",
+      "tags": [
+        "code",
+        "python"
+      ]
+    },
+    {
+      "id": "file:tests/test_edge_cases.py",
+      "type": "file",
+      "name": "test_edge_cases.py",
+      "filePath": "tests/test_edge_cases.py",
+      "summary": "code file containing 374 lines.",
+      "tags": [
+        "code",
+        "python"
+      ]
+    },
+    {
+      "id": "file:tests/test_ml_pipeline.py",
+      "type": "file",
+      "name": "test_ml_pipeline.py",
+      "filePath": "tests/test_ml_pipeline.py",
+      "summary": "code file containing 283 lines.",
+      "tags": [
+        "code",
+        "python"
+      ]
+    },
+    {
+      "id": "file:tests/test_train_automl.py",
+      "type": "file",
+      "name": "test_train_automl.py",
+      "filePath": "tests/test_train_automl.py",
+      "summary": "code file containing 285 lines.",
+      "tags": [
+        "code",
+        "python"
+      ]
+    },
+    {
+      "id": "file:train_automl.py",
+      "type": "file",
+      "name": "train_automl.py",
+      "filePath": "train_automl.py",
+      "summary": "code file containing 294 lines.",
+      "tags": [
+        "code",
+        "python"
+      ]
+    },
+    {
+      "id": "function:app.py:load_bundle",
+      "type": "function",
+      "name": "load_bundle",
+      "filePath": "app.py",
+      "summary": "Function load_bundle defined in app.py.",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:app.py:compute_pca",
+      "type": "function",
+      "name": "compute_pca",
+      "filePath": "app.py",
+      "summary": "Function compute_pca defined in app.py.",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:app.py:get_positive_proba",
+      "type": "function",
+      "name": "get_positive_proba",
+      "filePath": "app.py",
+      "summary": "Function get_positive_proba defined in app.py.",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:app.py:load_dataframe_from_sklearn",
+      "type": "function",
+      "name": "load_dataframe_from_sklearn",
+      "filePath": "app.py",
+      "summary": "Function load_dataframe_from_sklearn defined in app.py.",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:app.py:load_dataframe_from_upload",
+      "type": "function",
+      "name": "load_dataframe_from_upload",
+      "filePath": "app.py",
+      "summary": "Function load_dataframe_from_upload defined in app.py.",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:tests/conftest.py:raw_dataframe",
+      "type": "function",
+      "name": "raw_dataframe",
+      "filePath": "tests/conftest.py",
+      "summary": "Function raw_dataframe defined in tests/conftest.py.",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:tests/conftest.py:feature_target_split",
+      "type": "function",
+      "name": "feature_target_split",
+      "filePath": "tests/conftest.py",
+      "summary": "Function feature_target_split defined in tests/conftest.py.",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:tests/conftest.py:train_test_data",
+      "type": "function",
+      "name": "train_test_data",
+      "filePath": "tests/conftest.py",
+      "summary": "Function train_test_data defined in tests/conftest.py.",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:tests/conftest.py:bundle",
+      "type": "function",
+      "name": "bundle",
+      "filePath": "tests/conftest.py",
+      "summary": "Function bundle defined in tests/conftest.py.",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:tests/conftest.py:bundle_models",
+      "type": "function",
+      "name": "bundle_models",
+      "filePath": "tests/conftest.py",
+      "summary": "Function bundle_models defined in tests/conftest.py.",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:tests/conftest.py:bundle_scaler",
+      "type": "function",
+      "name": "bundle_scaler",
+      "filePath": "tests/conftest.py",
+      "summary": "Function bundle_scaler defined in tests/conftest.py.",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:tests/conftest.py:bundle_feature_names",
+      "type": "function",
+      "name": "bundle_feature_names",
+      "filePath": "tests/conftest.py",
+      "summary": "Function bundle_feature_names defined in tests/conftest.py.",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:tests/conftest.py:bundle_metadata",
+      "type": "function",
+      "name": "bundle_metadata",
+      "filePath": "tests/conftest.py",
+      "summary": "Function bundle_metadata defined in tests/conftest.py.",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:tests/conftest.py:inference_data",
+      "type": "function",
+      "name": "inference_data",
+      "filePath": "tests/conftest.py",
+      "summary": "Function inference_data defined in tests/conftest.py.",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:tests/conftest.py:tiny_scaled_data",
+      "type": "function",
+      "name": "tiny_scaled_data",
+      "filePath": "tests/conftest.py",
+      "summary": "Function tiny_scaled_data defined in tests/conftest.py.",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:tests/test_app_utils.py:_import_app_functions",
+      "type": "function",
+      "name": "_import_app_functions",
+      "filePath": "tests/test_app_utils.py",
+      "summary": "Function _import_app_functions defined in tests/test_app_utils.py.",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:tests/test_app_utils.py:trained_models",
+      "type": "function",
+      "name": "trained_models",
+      "filePath": "tests/test_app_utils.py",
+      "summary": "Function trained_models defined in tests/test_app_utils.py.",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "class:tests/test_app_utils.py:TestGetPositiveProba",
+      "type": "class",
+      "name": "TestGetPositiveProba",
+      "filePath": "tests/test_app_utils.py",
+      "summary": "Class TestGetPositiveProba defined in tests/test_app_utils.py.",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "class:tests/test_app_utils.py:TestLoadDataframeFromSklearn",
+      "type": "class",
+      "name": "TestLoadDataframeFromSklearn",
+      "filePath": "tests/test_app_utils.py",
+      "summary": "Class TestLoadDataframeFromSklearn defined in tests/test_app_utils.py.",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "class:tests/test_app_utils.py:TestLoadDataframeFromUpload",
+      "type": "class",
+      "name": "TestLoadDataframeFromUpload",
+      "filePath": "tests/test_app_utils.py",
+      "summary": "Class TestLoadDataframeFromUpload defined in tests/test_app_utils.py.",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "class:tests/test_app_utils.py:TestComputePCA",
+      "type": "class",
+      "name": "TestComputePCA",
+      "filePath": "tests/test_app_utils.py",
+      "summary": "Class TestComputePCA defined in tests/test_app_utils.py.",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "class:tests/test_app_utils.py:TestFeatureAlignment",
+      "type": "class",
+      "name": "TestFeatureAlignment",
+      "filePath": "tests/test_app_utils.py",
+      "summary": "Class TestFeatureAlignment defined in tests/test_app_utils.py.",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "class:tests/test_edge_cases.py:TestEmptyInput",
+      "type": "class",
+      "name": "TestEmptyInput",
+      "filePath": "tests/test_edge_cases.py",
+      "summary": "Class TestEmptyInput defined in tests/test_edge_cases.py.",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "class:tests/test_edge_cases.py:TestWrongShape",
+      "type": "class",
+      "name": "TestWrongShape",
+      "filePath": "tests/test_edge_cases.py",
+      "summary": "Class TestWrongShape defined in tests/test_edge_cases.py.",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "class:tests/test_edge_cases.py:TestMissingCorruptedBundle",
+      "type": "class",
+      "name": "TestMissingCorruptedBundle",
+      "filePath": "tests/test_edge_cases.py",
+      "summary": "Class TestMissingCorruptedBundle defined in tests/test_edge_cases.py.",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "class:tests/test_edge_cases.py:TestNaNInfInput",
+      "type": "class",
+      "name": "TestNaNInfInput",
+      "filePath": "tests/test_edge_cases.py",
+      "summary": "Class TestNaNInfInput defined in tests/test_edge_cases.py.",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "class:tests/test_edge_cases.py:TestBoundaryData",
+      "type": "class",
+      "name": "TestBoundaryData",
+      "filePath": "tests/test_edge_cases.py",
+      "summary": "Class TestBoundaryData defined in tests/test_edge_cases.py.",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "class:tests/test_edge_cases.py:TestThresholdBoundaries",
+      "type": "class",
+      "name": "TestThresholdBoundaries",
+      "filePath": "tests/test_edge_cases.py",
+      "summary": "Class TestThresholdBoundaries defined in tests/test_edge_cases.py.",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "class:tests/test_edge_cases.py:TestCSVMismatch",
+      "type": "class",
+      "name": "TestCSVMismatch",
+      "filePath": "tests/test_edge_cases.py",
+      "summary": "Class TestCSVMismatch defined in tests/test_edge_cases.py.",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "class:tests/test_ml_pipeline.py:TestModelLoading",
+      "type": "class",
+      "name": "TestModelLoading",
+      "filePath": "tests/test_ml_pipeline.py",
+      "summary": "Class TestModelLoading defined in tests/test_ml_pipeline.py.",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "class:tests/test_ml_pipeline.py:TestPredictionValidity",
+      "type": "class",
+      "name": "TestPredictionValidity",
+      "filePath": "tests/test_ml_pipeline.py",
+      "summary": "Class TestPredictionValidity defined in tests/test_ml_pipeline.py.",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "class:tests/test_ml_pipeline.py:TestScalerConsistency",
+      "type": "class",
+      "name": "TestScalerConsistency",
+      "filePath": "tests/test_ml_pipeline.py",
+      "summary": "Class TestScalerConsistency defined in tests/test_ml_pipeline.py.",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "class:tests/test_ml_pipeline.py:TestConsensusLogic",
+      "type": "class",
+      "name": "TestConsensusLogic",
+      "filePath": "tests/test_ml_pipeline.py",
+      "summary": "Class TestConsensusLogic defined in tests/test_ml_pipeline.py.",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "class:tests/test_ml_pipeline.py:TestSHAPCompatibility",
+      "type": "class",
+      "name": "TestSHAPCompatibility",
+      "filePath": "tests/test_ml_pipeline.py",
+      "summary": "Class TestSHAPCompatibility defined in tests/test_ml_pipeline.py.",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "class:tests/test_ml_pipeline.py:TestMetricComputation",
+      "type": "class",
+      "name": "TestMetricComputation",
+      "filePath": "tests/test_ml_pipeline.py",
+      "summary": "Class TestMetricComputation defined in tests/test_ml_pipeline.py.",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "class:tests/test_train_automl.py:TestLoadData",
+      "type": "class",
+      "name": "TestLoadData",
+      "filePath": "tests/test_train_automl.py",
+      "summary": "Class TestLoadData defined in tests/test_train_automl.py.",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "class:tests/test_train_automl.py:TestEvaluateModels",
+      "type": "class",
+      "name": "TestEvaluateModels",
+      "filePath": "tests/test_train_automl.py",
+      "summary": "Class TestEvaluateModels defined in tests/test_train_automl.py.",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "class:tests/test_train_automl.py:TestTrainFlamlModel",
+      "type": "class",
+      "name": "TestTrainFlamlModel",
+      "filePath": "tests/test_train_automl.py",
+      "summary": "Class TestTrainFlamlModel defined in tests/test_train_automl.py.",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "class:tests/test_train_automl.py:TestDataSplitAndScaling",
+      "type": "class",
+      "name": "TestDataSplitAndScaling",
+      "filePath": "tests/test_train_automl.py",
+      "summary": "Class TestDataSplitAndScaling defined in tests/test_train_automl.py.",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "class:tests/test_train_automl.py:TestBundleRoundTrip",
+      "type": "class",
+      "name": "TestBundleRoundTrip",
+      "filePath": "tests/test_train_automl.py",
+      "summary": "Class TestBundleRoundTrip defined in tests/test_train_automl.py.",
+      "tags": [
+        "class"
+      ]
+    },
+    {
+      "id": "function:train_automl.py:load_data",
+      "type": "function",
+      "name": "load_data",
+      "filePath": "train_automl.py",
+      "summary": "Function load_data defined in train_automl.py.",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:train_automl.py:train_flaml_model",
+      "type": "function",
+      "name": "train_flaml_model",
+      "filePath": "train_automl.py",
+      "summary": "Function train_flaml_model defined in train_automl.py.",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:train_automl.py:evaluate_models",
+      "type": "function",
+      "name": "evaluate_models",
+      "filePath": "train_automl.py",
+      "summary": "Function evaluate_models defined in train_automl.py.",
+      "tags": [
+        "function"
+      ]
+    },
+    {
+      "id": "function:train_automl.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "train_automl.py",
+      "summary": "Function main defined in train_automl.py.",
+      "tags": [
+        "function"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:app.py",
+      "target": "function:app.py:load_bundle",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:app.py",
+      "target": "function:app.py:compute_pca",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:app.py",
+      "target": "function:app.py:get_positive_proba",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:app.py",
+      "target": "function:app.py:load_dataframe_from_sklearn",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:app.py",
+      "target": "function:app.py:load_dataframe_from_upload",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/conftest.py",
+      "target": "function:tests/conftest.py:raw_dataframe",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/conftest.py",
+      "target": "function:tests/conftest.py:feature_target_split",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/conftest.py",
+      "target": "function:tests/conftest.py:train_test_data",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/conftest.py",
+      "target": "function:tests/conftest.py:bundle",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/conftest.py",
+      "target": "function:tests/conftest.py:bundle_models",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/conftest.py",
+      "target": "function:tests/conftest.py:bundle_scaler",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/conftest.py",
+      "target": "function:tests/conftest.py:bundle_feature_names",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/conftest.py",
+      "target": "function:tests/conftest.py:bundle_metadata",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/conftest.py",
+      "target": "function:tests/conftest.py:inference_data",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/conftest.py",
+      "target": "function:tests/conftest.py:tiny_scaled_data",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_app_utils.py",
+      "target": "function:tests/test_app_utils.py:_import_app_functions",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_app_utils.py",
+      "target": "function:tests/test_app_utils.py:trained_models",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_app_utils.py",
+      "target": "class:tests/test_app_utils.py:TestGetPositiveProba",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_app_utils.py",
+      "target": "class:tests/test_app_utils.py:TestLoadDataframeFromSklearn",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_app_utils.py",
+      "target": "class:tests/test_app_utils.py:TestLoadDataframeFromUpload",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_app_utils.py",
+      "target": "class:tests/test_app_utils.py:TestComputePCA",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_app_utils.py",
+      "target": "class:tests/test_app_utils.py:TestFeatureAlignment",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_edge_cases.py",
+      "target": "class:tests/test_edge_cases.py:TestEmptyInput",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_edge_cases.py",
+      "target": "class:tests/test_edge_cases.py:TestWrongShape",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_edge_cases.py",
+      "target": "class:tests/test_edge_cases.py:TestMissingCorruptedBundle",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_edge_cases.py",
+      "target": "class:tests/test_edge_cases.py:TestNaNInfInput",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_edge_cases.py",
+      "target": "class:tests/test_edge_cases.py:TestBoundaryData",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_edge_cases.py",
+      "target": "class:tests/test_edge_cases.py:TestThresholdBoundaries",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_edge_cases.py",
+      "target": "class:tests/test_edge_cases.py:TestCSVMismatch",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_ml_pipeline.py",
+      "target": "class:tests/test_ml_pipeline.py:TestModelLoading",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_ml_pipeline.py",
+      "target": "class:tests/test_ml_pipeline.py:TestPredictionValidity",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_ml_pipeline.py",
+      "target": "class:tests/test_ml_pipeline.py:TestScalerConsistency",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_ml_pipeline.py",
+      "target": "class:tests/test_ml_pipeline.py:TestConsensusLogic",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_ml_pipeline.py",
+      "target": "class:tests/test_ml_pipeline.py:TestSHAPCompatibility",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_ml_pipeline.py",
+      "target": "class:tests/test_ml_pipeline.py:TestMetricComputation",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_train_automl.py",
+      "target": "class:tests/test_train_automl.py:TestLoadData",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_train_automl.py",
+      "target": "class:tests/test_train_automl.py:TestEvaluateModels",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_train_automl.py",
+      "target": "class:tests/test_train_automl.py:TestTrainFlamlModel",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_train_automl.py",
+      "target": "class:tests/test_train_automl.py:TestDataSplitAndScaling",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_train_automl.py",
+      "target": "class:tests/test_train_automl.py:TestBundleRoundTrip",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:train_automl.py",
+      "target": "function:train_automl.py:load_data",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:train_automl.py",
+      "target": "function:train_automl.py:train_flaml_model",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:train_automl.py",
+      "target": "function:train_automl.py:evaluate_models",
+      "type": "contains",
+      "weight": 1
+    },
+    {
+      "source": "file:train_automl.py",
+      "target": "function:train_automl.py:main",
+      "type": "contains",
+      "weight": 1
+    }
+  ],
+  "layers": [
+    {
+      "id": "layer:application",
+      "name": "Application",
+      "description": "Application source and runtime entry points.",
+      "nodeIds": [
+        "file:.gitattributes",
+        "file:.ua/.understandignore",
+        "file:app.py",
+        "file:models_bundle.pkl",
+        "file:tests/__init__.py",
+        "file:tests/conftest.py",
+        "file:tests/test_app_utils.py",
+        "file:tests/test_edge_cases.py",
+        "file:tests/test_ml_pipeline.py",
+        "file:tests/test_train_automl.py",
+        "file:train_automl.py"
+      ]
+    },
+    {
+      "id": "layer:tests",
+      "name": "Tests",
+      "description": "Automated tests and test support.",
+      "nodeIds": [
+        "file:tests/__init__.py",
+        "file:tests/conftest.py",
+        "file:tests/test_app_utils.py",
+        "file:tests/test_edge_cases.py",
+        "file:tests/test_ml_pipeline.py",
+        "file:tests/test_train_automl.py"
+      ]
+    },
+    {
+      "id": "layer:documentation",
+      "name": "Documentation",
+      "description": "Project documentation and policies.",
+      "nodeIds": [
+        "document:CHANGELOG.md",
+        "document:CODE_OF_CONDUCT.md",
+        "document:README.md",
+        "document:SECURITY.md",
+        "document:TEST_REPORT.md",
+        "document:requirements.txt"
+      ]
+    },
+    {
+      "id": "layer:infrastructure",
+      "name": "Infrastructure",
+      "description": "Container and deployment configuration.",
+      "nodeIds": [
+        "config:.dockerignore",
+        "service:Dockerfile",
+        "service:docker-compose.yml"
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "order": 1,
+      "title": "Project Overview",
+      "description": "Read the README to understand the project purpose and workflow.",
+      "nodeIds": [
+        "document:README.md"
+      ]
+    },
+    {
+      "order": 2,
+      "title": "Application Entry Point",
+      "description": "Inspect app.py for loading, preprocessing, prediction, and presentation flow.",
+      "nodeIds": [
+        "file:app.py"
+      ]
+    },
+    {
+      "order": 3,
+      "title": "Training and Tests",
+      "description": "Review training utilities and tests covering model behavior.",
+      "nodeIds": [
+        "file:train_automl.py",
+        "file:tests/test_ml_pipeline.py"
+      ]
+    }
+  ]
+}

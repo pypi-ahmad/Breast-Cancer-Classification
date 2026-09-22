@@ -1,0 +1,1188 @@
+{
+  "version": "1.0.0",
+  "gitCommitHash": "05a0ccfb5da3e322f3c08b0716a1b900dc230f1e",
+  "generatedAt": "2026-09-22T07:37:29.710Z",
+  "files": {
+    ".dockerignore": {
+      "filePath": ".dockerignore",
+      "contentHash": "f9b55657584bc51519c69339d798a5c31926a1ba12e8683088267d6ee920c61d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 8,
+      "hasStructuralAnalysis": false
+    },
+    ".gitattributes": {
+      "filePath": ".gitattributes",
+      "contentHash": "d8fb0de4792538f93822b2c0d235604921299d5e54a3d6ec7a6cb34536e8bf1e",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 3,
+      "hasStructuralAnalysis": false
+    },
+    ".ua/.understandignore": {
+      "filePath": ".ua/.understandignore",
+      "contentHash": "3b4b2552fb621856e21c736be507b118f141106e1312999a3a47181426e0d7fe",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 76,
+      "hasStructuralAnalysis": false
+    },
+    "CHANGELOG.md": {
+      "filePath": "CHANGELOG.md",
+      "contentHash": "dd9ff491c41dbc0333363db631c263b8aa50da054d89b66ae67e2bb1baa6731e",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 21,
+      "hasStructuralAnalysis": true
+    },
+    "CODE_OF_CONDUCT.md": {
+      "filePath": "CODE_OF_CONDUCT.md",
+      "contentHash": "f06c7cfd36fef835b6cd63e61dd62c9d85fbe7e11aaabd357d18a933e375e426",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 39,
+      "hasStructuralAnalysis": true
+    },
+    "Dockerfile": {
+      "filePath": "Dockerfile",
+      "contentHash": "a1b2f8ac2f78c37049252ef5dbedb94703650bc9ab51d77578edb00994df0adc",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 18,
+      "hasStructuralAnalysis": true
+    },
+    "README.md": {
+      "filePath": "README.md",
+      "contentHash": "b2a71170a7f8113a5b549c84b15a4227db30d589a6f2b316a97a0974fb68351c",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 278,
+      "hasStructuralAnalysis": true
+    },
+    "SECURITY.md": {
+      "filePath": "SECURITY.md",
+      "contentHash": "5f5817696041950c546dd062ac26f41a9216fa023c1a1c3199eee79157595c40",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 25,
+      "hasStructuralAnalysis": true
+    },
+    "TEST_REPORT.md": {
+      "filePath": "TEST_REPORT.md",
+      "contentHash": "766ace03c2680554fc2ee8c602524daf36a69465e44c59c2c5a1d8466fc46be7",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 138,
+      "hasStructuralAnalysis": true
+    },
+    "app.py": {
+      "filePath": "app.py",
+      "contentHash": "70ca67b253c2e26a33d470541ce51f1a7fad900a9fcbea34cef565dbea755aa0",
+      "functions": [
+        {
+          "name": "load_bundle",
+          "params": [],
+          "exported": true,
+          "lineCount": 23
+        },
+        {
+          "name": "compute_pca",
+          "params": [
+            "x_scaled",
+            "labels"
+          ],
+          "exported": true,
+          "lineCount": 17
+        },
+        {
+          "name": "get_positive_proba",
+          "params": [
+            "model",
+            "x"
+          ],
+          "exported": true,
+          "lineCount": 27
+        },
+        {
+          "name": "load_dataframe_from_sklearn",
+          "params": [],
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "load_dataframe_from_upload",
+          "params": [
+            "uploaded_file"
+          ],
+          "exported": true,
+          "lineCount": 6
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "joblib",
+          "specifiers": [
+            "joblib"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        },
+        {
+          "source": "pandas.errors",
+          "specifiers": [
+            "EmptyDataError",
+            "ParserError"
+          ]
+        },
+        {
+          "source": "plotly.express",
+          "specifiers": [
+            "px"
+          ]
+        },
+        {
+          "source": "plotly.graph_objects",
+          "specifiers": [
+            "go"
+          ]
+        },
+        {
+          "source": "streamlit",
+          "specifiers": [
+            "st"
+          ]
+        },
+        {
+          "source": "shap",
+          "specifiers": [
+            "shap"
+          ]
+        },
+        {
+          "source": "matplotlib.pyplot",
+          "specifiers": [
+            "plt"
+          ]
+        },
+        {
+          "source": "sklearn.datasets",
+          "specifiers": [
+            "load_breast_cancer"
+          ]
+        },
+        {
+          "source": "sklearn.decomposition",
+          "specifiers": [
+            "PCA"
+          ]
+        },
+        {
+          "source": "sklearn.metrics",
+          "specifiers": [
+            "accuracy_score",
+            "confusion_matrix",
+            "f1_score",
+            "precision_score",
+            "recall_score",
+            "roc_curve",
+            "auc"
+          ]
+        }
+      ],
+      "exports": [
+        "load_bundle",
+        "compute_pca",
+        "get_positive_proba",
+        "load_dataframe_from_sklearn",
+        "load_dataframe_from_upload"
+      ],
+      "totalLines": 595,
+      "hasStructuralAnalysis": true
+    },
+    "docker-compose.yml": {
+      "filePath": "docker-compose.yml",
+      "contentHash": "fccbbdb36a0e03db906c4e24e2217a963f685e1ca6c0569667796e29e613a450",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 11,
+      "hasStructuralAnalysis": true
+    },
+    "models_bundle.pkl": {
+      "filePath": "models_bundle.pkl",
+      "contentHash": "8ff287e014f15818d64034dd5bbf5ed4722a24bccb7664ef0b95289deb13c315",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 4818,
+      "hasStructuralAnalysis": false
+    },
+    "requirements.txt": {
+      "filePath": "requirements.txt",
+      "contentHash": "9973d143b47a20a2a665e3990a8c10f1909c08c448018ec7d7318f7762b3c288",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 12,
+      "hasStructuralAnalysis": false
+    },
+    "tests/__init__.py": {
+      "filePath": "tests/__init__.py",
+      "contentHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1,
+      "hasStructuralAnalysis": true
+    },
+    "tests/conftest.py": {
+      "filePath": "tests/conftest.py",
+      "contentHash": "cd82147099d8dc52c071c2f26a821a5aa20af1e4db2579f6d94cf3fbbe91cdef",
+      "functions": [
+        {
+          "name": "raw_dataframe",
+          "params": [],
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "feature_target_split",
+          "params": [
+            "raw_dataframe"
+          ],
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "train_test_data",
+          "params": [
+            "feature_target_split"
+          ],
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "bundle",
+          "params": [],
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "bundle_models",
+          "params": [
+            "bundle"
+          ],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "bundle_scaler",
+          "params": [
+            "bundle"
+          ],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "bundle_feature_names",
+          "params": [
+            "bundle"
+          ],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "bundle_metadata",
+          "params": [
+            "bundle"
+          ],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "inference_data",
+          "params": [
+            "bundle_scaler",
+            "bundle_feature_names"
+          ],
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "tiny_scaled_data",
+          "params": [
+            "bundle_feature_names"
+          ],
+          "exported": true,
+          "lineCount": 6
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "joblib",
+          "specifiers": [
+            "joblib"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        },
+        {
+          "source": "pytest",
+          "specifiers": [
+            "pytest"
+          ]
+        },
+        {
+          "source": "sklearn.datasets",
+          "specifiers": [
+            "load_breast_cancer"
+          ]
+        },
+        {
+          "source": "sklearn.model_selection",
+          "specifiers": [
+            "train_test_split"
+          ]
+        },
+        {
+          "source": "sklearn.preprocessing",
+          "specifiers": [
+            "StandardScaler"
+          ]
+        }
+      ],
+      "exports": [
+        "raw_dataframe",
+        "feature_target_split",
+        "train_test_data",
+        "bundle",
+        "bundle_models",
+        "bundle_scaler",
+        "bundle_feature_names",
+        "bundle_metadata",
+        "inference_data",
+        "tiny_scaled_data"
+      ],
+      "totalLines": 114,
+      "hasStructuralAnalysis": true
+    },
+    "tests/test_app_utils.py": {
+      "filePath": "tests/test_app_utils.py",
+      "contentHash": "22241e157894a9bdc2036556cd6f57970e27c8dc4ee4675269e9bc631b8274b3",
+      "functions": [
+        {
+          "name": "_import_app_functions",
+          "params": [],
+          "exported": true,
+          "lineCount": 55
+        },
+        {
+          "name": "trained_models",
+          "params": [],
+          "exported": true,
+          "lineCount": 18
+        }
+      ],
+      "classes": [
+        {
+          "name": "TestGetPositiveProba",
+          "methods": [
+            "test_returns_1d_array",
+            "test_predict_proba_model_returns_class0_proba",
+            "test_random_forest_returns_class0_proba",
+            "test_values_in_zero_one_range",
+            "test_single_sample",
+            "test_decision_function_path",
+            "test_fallback_predict_only_model",
+            "test_model_with_no_methods"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 78
+        },
+        {
+          "name": "TestLoadDataframeFromSklearn",
+          "methods": [
+            "test_returns_dataframe",
+            "test_has_target_column",
+            "test_correct_row_count",
+            "test_target_is_numeric"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 18
+        },
+        {
+          "name": "TestLoadDataframeFromUpload",
+          "methods": [
+            "test_loads_csv_from_buffer",
+            "test_preserves_values",
+            "test_empty_csv"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 24
+        },
+        {
+          "name": "TestComputePCA",
+          "methods": [
+            "test_pca_returns_2d_dataframe",
+            "test_pca_explained_variance_sums_less_than_one",
+            "test_pca_with_labels"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 30
+        },
+        {
+          "name": "TestFeatureAlignment",
+          "methods": [
+            "test_reindex_preserves_matching_columns",
+            "test_reindex_fills_missing_with_zero",
+            "test_reindex_drops_extra_columns",
+            "test_reindex_all_missing"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 32
+        }
+      ],
+      "imports": [
+        {
+          "source": "io",
+          "specifiers": [
+            "io"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        },
+        {
+          "source": "pytest",
+          "specifiers": [
+            "pytest"
+          ]
+        },
+        {
+          "source": "sklearn.decomposition",
+          "specifiers": [
+            "PCA"
+          ]
+        },
+        {
+          "source": "sklearn.datasets",
+          "specifiers": [
+            "load_breast_cancer"
+          ]
+        },
+        {
+          "source": "sklearn.linear_model",
+          "specifiers": [
+            "LogisticRegression"
+          ]
+        },
+        {
+          "source": "sklearn.ensemble",
+          "specifiers": [
+            "RandomForestClassifier"
+          ]
+        },
+        {
+          "source": "sklearn.svm",
+          "specifiers": [
+            "SVC"
+          ]
+        },
+        {
+          "source": "sklearn.dummy",
+          "specifiers": [
+            "DummyClassifier"
+          ]
+        },
+        {
+          "source": "sklearn.preprocessing",
+          "specifiers": [
+            "StandardScaler"
+          ]
+        },
+        {
+          "source": "importlib",
+          "specifiers": [
+            "importlib"
+          ]
+        },
+        {
+          "source": "types",
+          "specifiers": [
+            "types"
+          ]
+        }
+      ],
+      "exports": [
+        "_import_app_functions",
+        "trained_models",
+        "TestGetPositiveProba",
+        "TestLoadDataframeFromSklearn",
+        "TestLoadDataframeFromUpload",
+        "TestComputePCA",
+        "TestFeatureAlignment"
+      ],
+      "totalLines": 331,
+      "hasStructuralAnalysis": true
+    },
+    "tests/test_edge_cases.py": {
+      "filePath": "tests/test_edge_cases.py",
+      "contentHash": "545af94ff4616764830c5bc5348b1fcd797f255cdab6315dd5664d1619ee8aa4",
+      "functions": [],
+      "classes": [
+        {
+          "name": "TestEmptyInput",
+          "methods": [
+            "test_predict_empty_array",
+            "test_predict_proba_empty_array",
+            "test_scaler_transform_empty",
+            "test_evaluate_models_empty_test_set"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 44
+        },
+        {
+          "name": "TestWrongShape",
+          "methods": [
+            "test_too_few_features",
+            "test_too_many_features",
+            "test_1d_input_rejected",
+            "test_scaler_wrong_features"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 29
+        },
+        {
+          "name": "TestMissingCorruptedBundle",
+          "methods": [
+            "test_load_nonexistent_bundle",
+            "test_load_empty_file_as_bundle",
+            "test_load_non_pickle_file",
+            "test_bundle_missing_models_key",
+            "test_bundle_missing_scaler_key",
+            "test_bundle_missing_feature_names_key"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 68
+        },
+        {
+          "name": "TestNaNInfInput",
+          "methods": [
+            "test_scaler_transform_with_nan",
+            "test_scaler_transform_with_inf",
+            "test_predict_with_nan_features",
+            "test_get_positive_proba_with_nan"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 37
+        },
+        {
+          "name": "TestBoundaryData",
+          "methods": [
+            "test_all_zeros_input",
+            "test_all_same_features",
+            "test_very_large_values",
+            "test_very_small_values"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 34
+        },
+        {
+          "name": "TestThresholdBoundaries",
+          "methods": [
+            "test_threshold_zero_all_positive",
+            "test_threshold_one_all_negative",
+            "test_consensus_threshold_zero"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 56
+        },
+        {
+          "name": "TestCSVMismatch",
+          "methods": [
+            "test_upload_csv_completely_wrong_columns",
+            "test_upload_csv_partial_columns",
+            "test_upload_csv_with_target"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 34
+        }
+      ],
+      "imports": [
+        {
+          "source": "io",
+          "specifiers": [
+            "io"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "tempfile",
+          "specifiers": [
+            "tempfile"
+          ]
+        },
+        {
+          "source": "pickle",
+          "specifiers": [
+            "pickle"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        },
+        {
+          "source": "pytest",
+          "specifiers": [
+            "pytest"
+          ]
+        },
+        {
+          "source": "joblib",
+          "specifiers": [
+            "joblib"
+          ]
+        },
+        {
+          "source": "sklearn.preprocessing",
+          "specifiers": [
+            "StandardScaler"
+          ]
+        },
+        {
+          "source": "sklearn.datasets",
+          "specifiers": [
+            "load_breast_cancer"
+          ]
+        },
+        {
+          "source": "train_automl",
+          "specifiers": [
+            "train_automl"
+          ]
+        },
+        {
+          "source": "tests.test_app_utils",
+          "specifiers": [
+            "get_positive_proba"
+          ]
+        }
+      ],
+      "exports": [
+        "TestEmptyInput",
+        "TestWrongShape",
+        "TestMissingCorruptedBundle",
+        "TestNaNInfInput",
+        "TestBoundaryData",
+        "TestThresholdBoundaries",
+        "TestCSVMismatch"
+      ],
+      "totalLines": 375,
+      "hasStructuralAnalysis": true
+    },
+    "tests/test_ml_pipeline.py": {
+      "filePath": "tests/test_ml_pipeline.py",
+      "contentHash": "c52728b8972a28d689ff5775e77623f7d79d751c8c409c607515b5072e132b99",
+      "functions": [],
+      "classes": [
+        {
+          "name": "TestModelLoading",
+          "methods": [
+            "test_all_models_have_predict",
+            "test_all_models_have_predict_proba_or_decision_function",
+            "test_expected_model_names",
+            "test_scaler_has_fitted_attributes",
+            "test_scaler_feature_count"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 38
+        },
+        {
+          "name": "TestPredictionValidity",
+          "methods": [
+            "test_predict_output_shape",
+            "test_predict_output_is_binary",
+            "test_predict_proba_output_shape",
+            "test_predict_proba_sums_to_one",
+            "test_predict_proba_in_range",
+            "test_single_sample_prediction",
+            "test_models_achieve_minimum_accuracy"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 63
+        },
+        {
+          "name": "TestScalerConsistency",
+          "methods": [
+            "test_scaler_transform_roundtrip",
+            "test_scaler_output_shape"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 17
+        },
+        {
+          "name": "TestConsensusLogic",
+          "methods": [
+            "test_consensus_score_range",
+            "test_consensus_diagnosis_is_valid"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 47
+        },
+        {
+          "name": "TestSHAPCompatibility",
+          "methods": [
+            "test_shap_tree_explainer_works_for_tree_models"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 35
+        },
+        {
+          "name": "TestMetricComputation",
+          "methods": [
+            "test_metrics_match_between_train_and_app"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 28
+        }
+      ],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        },
+        {
+          "source": "pytest",
+          "specifiers": [
+            "pytest"
+          ]
+        },
+        {
+          "source": "sklearn.metrics",
+          "specifiers": [
+            "accuracy_score",
+            "recall_score",
+            "precision_score",
+            "f1_score"
+          ]
+        }
+      ],
+      "exports": [
+        "TestModelLoading",
+        "TestPredictionValidity",
+        "TestScalerConsistency",
+        "TestConsensusLogic",
+        "TestSHAPCompatibility",
+        "TestMetricComputation"
+      ],
+      "totalLines": 284,
+      "hasStructuralAnalysis": true
+    },
+    "tests/test_train_automl.py": {
+      "filePath": "tests/test_train_automl.py",
+      "contentHash": "ae864aff41218855542025dc21ada62e8ba7e22c79c0046a0a90fbe8204d58b3",
+      "functions": [],
+      "classes": [
+        {
+          "name": "TestLoadData",
+          "methods": [
+            "test_returns_dataframe",
+            "test_has_target_column",
+            "test_correct_shape",
+            "test_target_values_are_binary",
+            "test_no_missing_values",
+            "test_feature_names_match_sklearn",
+            "test_csv_file_not_found_raises"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 40
+        },
+        {
+          "name": "TestEvaluateModels",
+          "methods": [
+            "test_returns_dataframe",
+            "test_has_required_columns",
+            "test_metrics_in_valid_range",
+            "test_one_row_per_model",
+            "test_empty_models_dict"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 47
+        },
+        {
+          "name": "TestTrainFlamlModel",
+          "methods": [
+            "test_returns_automl_object",
+            "test_model_can_predict",
+            "test_model_predict_values_are_binary",
+            "test_model_has_best_config"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 30
+        },
+        {
+          "name": "TestDataSplitAndScaling",
+          "methods": [
+            "test_split_sizes",
+            "test_stratification_preserved",
+            "test_scaler_mean_near_zero",
+            "test_scaler_std_near_one",
+            "test_no_data_leakage_scaler",
+            "test_feature_count_matches"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 60
+        },
+        {
+          "name": "TestBundleRoundTrip",
+          "methods": [
+            "test_bundle_file_exists",
+            "test_bundle_has_required_keys",
+            "test_bundle_models_is_dict",
+            "test_bundle_scaler_is_standard_scaler",
+            "test_bundle_feature_names_is_list",
+            "test_bundle_metadata_has_title",
+            "test_bundle_metadata_has_class_labels",
+            "test_bundle_models_not_empty",
+            "test_bundle_round_trip_integrity"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 51
+        }
+      ],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "tempfile",
+          "specifiers": [
+            "tempfile"
+          ]
+        },
+        {
+          "source": "joblib",
+          "specifiers": [
+            "joblib"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        },
+        {
+          "source": "pytest",
+          "specifiers": [
+            "pytest"
+          ]
+        },
+        {
+          "source": "unittest.mock",
+          "specifiers": [
+            "patch"
+          ]
+        },
+        {
+          "source": "sklearn.preprocessing",
+          "specifiers": [
+            "StandardScaler"
+          ]
+        },
+        {
+          "source": "sklearn.datasets",
+          "specifiers": [
+            "load_breast_cancer"
+          ]
+        },
+        {
+          "source": "sklearn.model_selection",
+          "specifiers": [
+            "train_test_split"
+          ]
+        },
+        {
+          "source": "train_automl",
+          "specifiers": [
+            "train_automl"
+          ]
+        }
+      ],
+      "exports": [
+        "TestLoadData",
+        "TestEvaluateModels",
+        "TestTrainFlamlModel",
+        "TestDataSplitAndScaling",
+        "TestBundleRoundTrip"
+      ],
+      "totalLines": 286,
+      "hasStructuralAnalysis": true
+    },
+    "train_automl.py": {
+      "filePath": "train_automl.py",
+      "contentHash": "930aeeb92b63668666c863e3c2fb17f760d80dd1016471b7ec55894011545473",
+      "functions": [
+        {
+          "name": "load_data",
+          "params": [],
+          "returnType": "pd.DataFrame",
+          "exported": true,
+          "lineCount": 25
+        },
+        {
+          "name": "train_flaml_model",
+          "params": [
+            "x_train",
+            "y_train",
+            "estimator_name",
+            "time_budget"
+          ],
+          "returnType": "AutoML",
+          "exported": true,
+          "lineCount": 32
+        },
+        {
+          "name": "evaluate_models",
+          "params": [
+            "models",
+            "x_test",
+            "y_test"
+          ],
+          "returnType": "pd.DataFrame",
+          "exported": true,
+          "lineCount": 26
+        },
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 160
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "warnings",
+          "specifiers": [
+            "warnings"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "joblib",
+          "specifiers": [
+            "joblib"
+          ]
+        },
+        {
+          "source": "pandas",
+          "specifiers": [
+            "pd"
+          ]
+        },
+        {
+          "source": "numpy",
+          "specifiers": [
+            "np"
+          ]
+        },
+        {
+          "source": "flaml",
+          "specifiers": [
+            "AutoML"
+          ]
+        },
+        {
+          "source": "sklearn.datasets",
+          "specifiers": [
+            "load_breast_cancer"
+          ]
+        },
+        {
+          "source": "sklearn.model_selection",
+          "specifiers": [
+            "train_test_split"
+          ]
+        },
+        {
+          "source": "sklearn.preprocessing",
+          "specifiers": [
+            "StandardScaler"
+          ]
+        },
+        {
+          "source": "sklearn.metrics",
+          "specifiers": [
+            "accuracy_score",
+            "f1_score",
+            "precision_score",
+            "recall_score"
+          ]
+        }
+      ],
+      "exports": [
+        "load_data",
+        "train_flaml_model",
+        "evaluate_models",
+        "main"
+      ],
+      "totalLines": 295,
+      "hasStructuralAnalysis": true
+    }
+  }
+}
