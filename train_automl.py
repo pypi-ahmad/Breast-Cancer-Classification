@@ -5,16 +5,23 @@ This script uses Microsoft FLAML to automatically train and tune multiple classi
 (LGBM, XGBoost, Random Forest, etc.) on a specified dataset. It saves the trained models,
 scaler, and metadata into a pickle bundle for the dashboard app.
 """
+import argparse
+import shutil
+import sys
 import warnings
 from pathlib import Path
+
 import joblib
-import pandas as pd
 import numpy as np
+import pandas as pd
 from flaml import AutoML
 from sklearn.datasets import load_breast_cancer
+from sklearn.exceptions import ConvergenceWarning
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
+
+from foundation_models import MitraV2ClassifierAdapter, TabFMClassifierAdapter
 
 try:
     from lazypredict.Supervised import LazyClassifier
@@ -42,6 +49,119 @@ CLASS_LABELS = {0: "Malignant", 1: "Benign"} # Map numeric targets to text
 TEST_SIZE = 0.2
 TIME_BUDGET = 90 # Seconds per model
 LAZY_TOP_N = 5   # Number of top LazyPredict models to save in bundle
+
+MITRA_REPO = "autogluon/mitra-classifier-2"
+MITRA_REVISION = "edada0d20759c58ada8c8605c25f22f6e98ea5f0"
+TABFM_REPO = "google/tabfm-1.0.0-pytorch"
+TABFM_REVISION = "77cb9cc1b4fd3a9c77fbb9552c218200bb4dab83"
+
+
+def parse_args(argv=None):
+    parser = argparse.ArgumentParser(description="Train breast-cancer classifiers.")
+    parser.add_argument(
+        "--foundation-models",
+        nargs="*",
+        choices=("mitra", "tabfm"),
+        default=[],
+        help="Optional tabular foundation classifiers to include.",
+    )
+    parser.add_argument(
+        "--accept-tabfm-noncommercial-license",
+        action="store_true",
+        help="Confirm TabFM weights will only be used for noncommercial research.",
+    )
+    return parser.parse_args(argv)
+
+
+def validate_foundation_args(args) -> None:
+    if "tabfm" in args.foundation_models and not args.accept_tabfm_noncommercial_license:
+        raise SystemExit(
+            "TabFM weights are noncommercial and nonproduction. Re-run with "
+            "--accept-tabfm-noncommercial-license to confirm research-only use."
+        )
+
+
+def train_foundation_models(x_train, y_train, feature_names, requested):
+    """Train requested classifiers; failures are fatal instead of silently skipped."""
+    import truststore
+
+    truststore.inject_into_ssl()
+    from huggingface_hub import snapshot_download
+
+    models = {}
+    metadata = {}
+
+    if "mitra" in requested:
+        print("\n🧬 Loading Mitra v2 classifier (inference mode)...")
+        snapshot = snapshot_download(repo_id=MITRA_REPO, revision=MITRA_REVISION)
+        artifact_path = Path("model_artifacts/mitra-v2")
+        shutil.rmtree(artifact_path, ignore_errors=True)
+        train_frame = pd.DataFrame(x_train, columns=feature_names)
+        train_frame[TARGET_COLUMN] = np.asarray(y_train)
+
+        from autogluon.tabular import TabularPredictor
+
+        config = {
+            "hf_model": snapshot,
+            "fine_tune": False,
+            "ag_args_fit": {"ag.max_memory_usage_ratio": 1.25},
+        }
+        try:
+            import torch
+
+            if torch.cuda.is_available():
+                config["ag_args_fit"]["num_gpus"] = 1
+        except ImportError:
+            pass
+
+        def fit_mitra(model_config):
+            return TabularPredictor(label=TARGET_COLUMN, path=str(artifact_path)).fit(
+                train_frame,
+                hyperparameters={"MITRA": model_config},
+                fit_weighted_ensemble=False,
+            )
+
+        try:
+            fit_mitra(config)
+        except RuntimeError as exc:
+            if (
+                "out of memory" not in str(exc).lower()
+                or "num_gpus" not in config["ag_args_fit"]
+            ):
+                raise
+            print("⚠️  Mitra exhausted CUDA memory; retrying on CPU.")
+            shutil.rmtree(artifact_path, ignore_errors=True)
+            config["ag_args_fit"].pop("num_gpus")
+            fit_mitra(config)
+
+        models["Mitra v2 Classifier"] = MitraV2ClassifierAdapter(
+            str(artifact_path), feature_names
+        )
+        metadata["mitra"] = {
+            "source": MITRA_REPO,
+            "revision": MITRA_REVISION,
+            "license": "Apache-2.0",
+            "research_only": False,
+        }
+
+    if "tabfm" in requested:
+        print("\n🔬 Loading TabFM classifier on CPU (research-only weights)...")
+        snapshot = snapshot_download(
+            repo_id=TABFM_REPO,
+            revision=TABFM_REVISION,
+            allow_patterns=["classification/**"],
+        )
+        models["TabFM Classifier (Research Only)"] = TabFMClassifierAdapter(
+            snapshot, x_train, np.asarray(y_train)
+        )
+        metadata["tabfm"] = {
+            "source": TABFM_REPO,
+            "revision": TABFM_REVISION,
+            "license": "tabfm-non-commercial-v1.0",
+            "research_only": True,
+        }
+
+    return models, metadata
 
 def load_data() -> pd.DataFrame:
     """
@@ -116,7 +236,11 @@ def evaluate_models(models: dict, x_test: np.ndarray, y_test: pd.Series) -> pd.D
     """
     results = []
     for name, model in models.items():
-        y_pred = model.predict(x_test)
+        try:
+            y_pred = model.predict(x_test)
+        finally:
+            if hasattr(model, "release_runtime"):
+                model.release_runtime()
         # FLAML predict returns numpy array, ensure it matches y_test type for metrics if needed
         
         metrics = {
@@ -129,7 +253,7 @@ def evaluate_models(models: dict, x_test: np.ndarray, y_test: pd.Series) -> pd.D
         results.append(metrics)
     return pd.DataFrame(results)
 
-def main():
+def main(argv=None):
     """
     Main execution pipeline:
     1. Load Data
@@ -137,7 +261,12 @@ def main():
     3. Train Multiple AutoML Models
     4. Evaluate & Save Bundle
     """
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+    args = parse_args(argv)
+    validate_foundation_args(args)
     warnings.filterwarnings("default")
+    warnings.filterwarnings("ignore", category=ConvergenceWarning)
     print(f"🚀 Starting {APP_TITLE} Model Training Engine")
     print(f"⚙️  Time Budget: {TIME_BUDGET}s per model")
 
@@ -234,7 +363,7 @@ def main():
         except Exception as e:
             print(f"⚠️  LazyPredict failed: {e}")
     else:
-        print("\n⚠️  LazyPredict not installed – skipping. pip install lazypredict to enable.")
+        print("\n⚠️  LazyPredict is unavailable in the current uv environment; skipping.")
 
     # Evaluate saved LazyPredict models with our scaler (validates compatibility)
     lazy_results_df = pd.DataFrame()
@@ -249,13 +378,26 @@ def main():
     all_models.update(trained_models)       # FLAML models
     all_models.update(lazy_trained_models)  # LazyPredict models
 
+    foundation_models, foundation_metadata = train_foundation_models(
+        X_train_scaled, y_train, feature_names, args.foundation_models
+    ) if args.foundation_models else ({}, {})
+    foundation_results_df = pd.DataFrame()
+    if foundation_models:
+        print("\n📊 Evaluating foundation classifiers...")
+        foundation_results_df = evaluate_models(foundation_models, X_test_scaled, y_test)
+        foundation_results_df["Framework"] = "Foundation"
+        print(foundation_results_df.to_string(index=False))
+        all_models.update(foundation_models)
+
     # 8. FLAML vs LazyPredict Comparison
     print("\n" + "=" * 80)
     print("🏆 FLAML vs LazyPredict — Head-to-Head Comparison")
     print("=" * 80)
 
     if not lazy_results_df.empty:
-        combined_df = pd.concat([flaml_results_df, lazy_results_df], ignore_index=True)
+        combined_df = pd.concat(
+            [flaml_results_df, lazy_results_df, foundation_results_df], ignore_index=True
+        )
         combined_df = combined_df.sort_values(by="Accuracy", ascending=False).reset_index(drop=True)
         print(combined_df.to_string(index=False))
 
@@ -282,12 +424,17 @@ def main():
         "metadata": {
             "title": APP_TITLE,
             "class_labels": CLASS_LABELS,
-            "target_column": TARGET_COLUMN
+            "target_column": TARGET_COLUMN,
+            "foundation_models": foundation_metadata,
+            "research_only": any(
+                item["research_only"] for item in foundation_metadata.values()
+            ),
         }
     }
     joblib.dump(bundle, "models_bundle.pkl")
     print(f"\n📦 Model bundle saved to 'models_bundle.pkl' ({len(all_models)} models: "
-          f"{len(trained_models)} FLAML + {len(lazy_trained_models)} LazyPredict)")
+          f"{len(trained_models)} FLAML + {len(lazy_trained_models)} LazyPredict + "
+          f"{len(foundation_models)} foundation)")
     print("✅ Ready for app.py!")
 
 if __name__ == "__main__":
